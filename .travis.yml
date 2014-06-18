@@ -1,0 +1,12 @@
+language: scala
+scala:
+  - 2.10.4
+script: 
+  - sbt ++$TRAVIS_SCALA_VERSION scripted
+notifications:
+  email:
+    recipients:
+      - brandon@arpnetworking.com
+jdk:
+  - openjdk7
+  - oraclejdk7
