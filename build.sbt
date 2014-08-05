@@ -20,7 +20,7 @@ organization := "com.arpnetworking"
 
 name := "sbt-typescript"
 
-version := "0.1.1-SNAPSHOT"
+version := "0.1.5-SNAPSHOT"
 
 scalaVersion := "2.10.4"
 
@@ -41,7 +41,38 @@ addSbtPlugin("com.typesafe.sbt" %% "sbt-js-engine" % "1.0.0")
 
 scalacOptions += "-feature"
 
-publishMavenStyle := false
+publishMavenStyle := true
+
+publishTo := {
+  val nexus = "https://oss.sonatype.org/"
+  if (isSnapshot.value)
+    Some("snapshots" at nexus + "content/repositories/snapshots")
+  else
+    Some("releases" at nexus + "service/local/staging/deploy/maven2")
+}
+
+pomIncludeRepository := { _ => false}
+
+pomExtra := (
+  <url>http://jsuereth.com/scala-arm</url>
+    <licenses>
+      <license>
+        <name>Apache 2</name>
+        <url>http://www.apache.org/licenses/LICENSE-2.0</url>
+        <distribution>repo</distribution>
+      </license>
+    </licenses>
+    <scm>
+      <url>git@github.com:ArpNetworking/sbt-typescript.git</url>
+      <connection>scm:git:git@github.com:ArpNetworking/sbt-typescript.git</connection>
+    </scm>
+    <developers>
+      <developer>
+        <id>barp</id>
+        <name>Brandon Arp</name>
+        <url>http://www.arpnetworking.com</url>
+      </developer>
+    </developers>)
 
 scriptedSettings
 
