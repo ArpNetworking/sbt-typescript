@@ -1,4 +1,4 @@
-sbt-typescript
+sbt-typescript  [![Build Status](https://travis-ci.org/ArpNetworking/sbt-typescript.svg?branch=master)](https://travis-ci.org/ArpNetworking/sbt-typescript)
 ========
 
 Allows TypeScript to be used from within sbt. Leverages the functionality of com.typesafe.sbt:js-engine to run the 
