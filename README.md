@@ -37,4 +37,13 @@ includeFilter in TypescriptKeys.typescript := "myFile.ts"
 
 You can also set an exclude filter in the same way.
 
+A note on typescript compiling speed
+------------------------------------
+
+Sometimes the default engine (Trireme) can be quite slow. If you're experiencing long typescript compile times you can always switch to node.js ([remember to install it first](http://nodejs.org/download/)) adding this line to your `build.sbt` file:
+
+```scala
+JsEngineKeys.engineType := JsEngineKeys.EngineType.Node
+```
+
 &copy; Groupon Inc., 2014
