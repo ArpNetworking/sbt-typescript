@@ -31,6 +31,23 @@
         writeFile: nodefn.lift(fs.writeFile)
     };
 
+    var logger = makeLogger(args.options.logLevel);
+
+    function makeLogger (logLevel) {
+        var that = {};
+        that.info = function (message) {
+            console.log(message);
+        };
+
+        that.debug = function (message) {
+            if (logLevel === 'debug') {
+                console.log(message);
+            }
+        };
+
+        return that;
+    }
+
     function createCompilerSettings(options) {
         var compSettings = new TypeScript.CompilationSettings();
 
@@ -97,7 +114,6 @@
         while (sourceUnitsToParse.length > 0) {
             /*jshint -W083 */
             var sourceToParse = sourceUnitsToParse.shift();
-
             parsedUnits[sourceToParse.path] = sourceToParse.content;
 
             var code = TypeScript.ScriptSnapshot.fromString(sourceToParse.content);
@@ -137,6 +153,7 @@
         //Now that we've parsed all the files, we can do the semantic analysis and code emission
         var files = compiler.fileNames();
         files.forEach(function (file) {
+            logger.debug('compiling source: ' + file);
             var semanticDiagnostics = compiler.getSemanticDiagnostics(file);
             semanticDiagnostics.forEach(function (element) {
                 recordDiagnostic(element, file, fs.readFileSync(file).toString());
