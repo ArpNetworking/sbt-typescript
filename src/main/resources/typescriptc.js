@@ -63,7 +63,7 @@
         var compilationResult = { source: '', deps: []};
         var compiler = new TypeScript.TypeScriptCompiler(new TypeScript.NullLogger(), createCompilerSettings(opt));
 
-        if (src.length == 0) {
+        if (src.length === 0) {
             return compilationResult;
         }
 
@@ -95,6 +95,7 @@
 
         //Walk over all the source units, adding references to the end
         while (sourceUnitsToParse.length > 0) {
+            /*jshint -W083 */
             var sourceToParse = sourceUnitsToParse.shift();
 
             parsedUnits[sourceToParse.path] = sourceToParse.content;
@@ -109,7 +110,7 @@
             });
 
 
-            fileReferencesInSource.forEach(function(t){compilationResult.deps.push(t)});
+            fileReferencesInSource.forEach(function(t){compilationResult.deps.push(t); });
 
             //Use our context to resolve the dependencies/references
             var referencedSourceUnits = compilationContext.resolveFiles(fileReferencesInSource, sourceToParse);
@@ -138,7 +139,7 @@
         files.forEach(function (file) {
             var semanticDiagnostics = compiler.getSemanticDiagnostics(file);
             semanticDiagnostics.forEach(function (element) {
-                recordDiagnostic(element, file, fs.readFileSync(file).toString())
+                recordDiagnostic(element, file, fs.readFileSync(file).toString());
             });
         });
 
@@ -187,7 +188,7 @@
 
             if (compilationContext.errors.length > 0) {
                 //Unfortunately we can only show the first error in the file
-                throw parseError(input, contents, compilationContext.errors[0])
+                throw parseError(input, contents, compilationContext.errors[0]);
             }
 
             return result;
