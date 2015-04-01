@@ -73,7 +73,8 @@ object SbtTypescript extends AutoPlugin {
       "moduleKind" -> JsString(moduleKind.value),
       "outFile" -> JsString(outFile.value),
       "outDir" -> JsString(outDir.value),
-      "removeComments" -> JsBoolean(removeComments.value)
+      "removeComments" -> JsBoolean(removeComments.value),
+      "logLevel" -> JsString(logLevel.value.toString)
 
     ).toString(),
 
@@ -118,7 +119,8 @@ object SbtTypescript extends AutoPlugin {
     moduleKind := "",
     outFile := "",
     outDir := "",
-    removeComments := false
+    removeComments := false,
+    logLevel := Level.Info
 
   ) ++ inTask(typescript)(
     SbtJsTask.jsTaskSpecificUnscopedSettings ++
