@@ -32,16 +32,42 @@
     };
 
     var logger = makeLogger(args.options.logLevel);
+    logger.info("starting compile");
 
     function makeLogger (logLevel) {
         var that = {};
-        that.info = function (message) {
-            console.log(message);
-        };
-
         that.debug = function (message) {
             if (logLevel === 'debug') {
                 console.log(message);
+            }
+        };
+
+        that.info = function (message) {
+            if (logLevel === 'debug' || logLevel === 'info') {
+                console.log(message);
+            }
+        };
+
+        that.warn = function (message) {
+            if (logLevel === 'debug' || logLevel === 'info' || logLevel === 'warn') {
+                console.log(message);
+            }
+        };
+
+        that.error = function (message, error) {
+            if (logLevel === 'debug' || logLevel === 'info' || logLevel === 'warn' || logLevel === 'error') {
+                if (error !== undefined) {
+                    var errorMessage = error.message;
+                    if (error.fileName !== undefined) {
+                        errorMessage = errorMessage + " in " + error.fileName;
+                    }
+                    if (error.lineNumber !== undefined) {
+                        errorMessage = errorMessage + " at line " + error.lineNumber;
+                    }
+                    console.log(message + " " + errorMessage);
+                } else {
+                    console.log(message);
+                }
             }
         };
 
@@ -75,6 +101,7 @@
     }
 
     function compile(src, input, compilationContext) {
+        logger.debug("starting compilation of " + input);
         var opt = args.options;
         //compilationResult contains the compiled source and the dependencies
         var compilationResult = { source: '', deps: []};
@@ -109,6 +136,7 @@
             compilationContext.addError(problem);
         };
 
+        logger.debug("compiler created");
 
         //Walk over all the source units, adding references to the end
         while (sourceUnitsToParse.length > 0) {
@@ -160,12 +188,16 @@
             });
         });
 
-        var emitOutput = compiler.emitAll(compilationContext.basePath);
+        logger.debug("compilation completed, starting output");
+        var emitOutput = compiler.emitAll(function () { return compilationContext.basePath; });
         emitOutput.outputFiles.forEach(function (f) {
+            logger.debug("analyzing " + f.name);
             if (f.name.slice(0, -3) === input.slice(0, -3)) {
+                logger.debug("emitting " + f.name);
                 compilationResult.source += f.text;
             }
         });
+        logger.debug("output complete");
 
         return compilationResult;
     }
@@ -197,43 +229,50 @@
     };
 
     function processor(input, output) {
-        return promised.readFile(input, "utf8").then(function (contents) {
-            var options = args.options;
-            options.filename = input;
+        try {
+            logger.debug("entered processor");
+            return promised.readFile(input, "utf8").then(function (contents) {
+                logger.debug("read file " + input + " successfully");
+                var options = args.options;
+                options.filename = input;
 
-            var result = compile(contents, input, compilationContext);
+                var result = compile(contents, input, compilationContext);
 
-            if (compilationContext.errors.length > 0) {
-                //Unfortunately we can only show the first error in the file
-                throw parseError(input, contents, compilationContext.errors[0]);
-            }
-
-            return result;
-        }).then(function (result) {
-            return promised.mkdirp(path.dirname(output)).yield(result);
-        }).then(function (result) {
-            return promised.writeFile(output, result.source, "utf8").yield(result);
-        }).then(function (result) {
-            //Extract the paths from the deps references
-            var deps = [];
-            result.deps.forEach(function(ref) {
-                deps.push(ref.path);
-            });
-
-            return {
-                source: input,
-                result: {
-                    filesRead: [input].concat(deps),
-                    filesWritten: [output]
+                if (compilationContext.errors.length > 0) {
+                    //Unfortunately we can only show the first error in the file
+                    throw parseError(input, contents, compilationContext.errors[0]);
                 }
-            };
-        }).catch(function (e) {
-            if (jst.isProblem(e)) {
-                return e;
-            } else {
-                throw e;
-            }
-        });
+
+                return result;
+            }).then(function (result) {
+                return promised.mkdirp(path.dirname(output)).yield(result);
+            }).then(function (result) {
+                return promised.writeFile(output, result.source, "utf8").yield(result);
+            }).then(function (result) {
+                //Extract the paths from the deps references
+                var deps = [];
+                result.deps.forEach(function (ref) {
+                    deps.push(ref.path);
+                });
+
+                return {
+                    source: input,
+                    result: {
+                        filesRead: [input].concat(deps),
+                        filesWritten: [output]
+                    }
+                };
+            }).catch(function (e) {
+                logger.error("error in processor callback", e);
+                if (jst.isProblem(e)) {
+                    return e;
+                } else {
+                    throw e;
+                }
+            });
+        } catch (ex) {
+            logger.error("error in processor declaration", ex);
+        }
 
     }
 
@@ -251,5 +290,9 @@
         };
     }
 
-    jst.process({processor: processor, inExt: ".ts", outExt: ".js"}, args);
+    try {
+        jst.process({processor: processor, inExt: ".ts", outExt: ".js"}, args);
+    } catch (ex) {
+        logger.error("error compiling", ex);
+    }
 })();
