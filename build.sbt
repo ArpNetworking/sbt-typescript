@@ -13,7 +13,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
-
 sbtPlugin := true
 
 organization := "com.arpnetworking"
@@ -22,22 +21,23 @@ name := "sbt-typescript"
 
 version := "0.1.5-SNAPSHOT"
 
-scalaVersion := "2.10.4"
+scalaVersion := "2.10.5"
 
 libraryDependencies ++= Seq(
   "org.webjars" % "mkdirp" % "0.3.5",
-  "com.typesafe" % "jstranspiler" % "1.0.0",
-  "org.apache.commons" % "commons-lang3" % "3.0"
+  "org.webjars" % "typescript-node" % "1.5.0-beta",
+  "com.typesafe" % "jstranspiler" % "1.0.0"
 )
 
 resolvers ++= Seq(
+  Resolver.mavenLocal,
   "Typesafe Releases Repository" at "http://repo.typesafe.com/typesafe/releases/",
   Resolver.url("sbt snapshot plugins", url("http://repo.scala-sbt.org/scalasbt/sbt-plugin-snapshots"))(Resolver.ivyStylePatterns),
   Resolver.sonatypeRepo("snapshots"),
   "Typesafe Snapshots Repository" at "http://repo.typesafe.com/typesafe/snapshots/"
 )
 
-addSbtPlugin("com.typesafe.sbt" %% "sbt-js-engine" % "1.0.0")
+addSbtPlugin("com.typesafe.sbt" %% "sbt-js-engine" % "1.0.2")
 
 scalacOptions += "-feature"
 
@@ -54,7 +54,7 @@ publishTo := {
 pomIncludeRepository := { _ => false}
 
 pomExtra := (
-  <url>http://jsuereth.com/scala-arm</url>
+  <url>https://github.com/ArpNetworking/sbt-typescript</url>
     <licenses>
       <license>
         <name>Apache 2</name>
@@ -77,3 +77,5 @@ pomExtra := (
 scriptedSettings
 
 scriptedLaunchOpts <+= version apply { v => s"-Dproject.version=$v" }
+
+scriptedBufferLog := false

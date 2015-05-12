@@ -16,15 +16,12 @@
 
 package com.arpnetworking.sbt.typescript
 
+import com.typesafe.sbt.jse.JsEngineImport.JsEngineKeys
 import sbt._
 import com.typesafe.sbt.jse.SbtJsTask
 import com.typesafe.sbt.web.SbtWeb
 import sbt.Keys._
 import spray.json.{JsString, JsBoolean, JsObject}
-import com.google.common.io.Files
-import com.google.common.base.Charsets
-import scala.io.Source
-import org.apache.commons.lang3.StringEscapeUtils
 
 object Import {
 
@@ -70,43 +67,14 @@ object SbtTypescript extends AutoPlugin {
       "mapRoot" -> JsString(mapRoot.value),
       "target" -> JsString(target.value),
       "noImplicitAny" -> JsBoolean(noImplicitAny.value),
+
       "moduleKind" -> JsString(moduleKind.value),
       "outFile" -> JsString(outFile.value),
       "outDir" -> JsString(outDir.value),
       "removeComments" -> JsBoolean(removeComments.value),
       "logLevel" -> JsString(logLevel.value.toString)
 
-    ).toString(),
-
-    typescriptGenerateCompiler in typescript := {
-      val compileFile = taskTemporaryDirectory.value / "typescript" / "generatedCompiler.js"
-      compileFile.getParentFile.mkdirs()
-
-      val output = Files.newWriter(compileFile, Charsets.UTF_8)
-      val cl = getClass.getClassLoader
-
-      val libdtsStream = cl.getResourceAsStream("typescript/lib.d.ts")
-      val libdtsFile = Source.fromInputStream(libdtsStream)
-      val libdtsString = libdtsFile.getLines().mkString("\n")
-
-      output.write("/*global process, require */\n")
-
-      output.write("\nvar libdts = \"" + StringEscapeUtils.escapeEcmaScript(libdtsString) + "\"")
-
-      //Write the official typescript compiler
-      val tscStream = cl.getResourceAsStream("typescript/typescript.js")
-      val tscFile = Source.fromInputStream(tscStream)
-      output.write(tscFile.getLines().mkString("\n"))
-
-      //Write the typescript compiler shim
-      val typescriptcStream = cl.getResourceAsStream("typescriptc.js")
-      val typescriptcFile = Source.fromInputStream(typescriptcStream)
-      output.write(typescriptcFile.getLines().mkString("\n"))
-
-      output.flush()
-      output.close()
-      compileFile
-    }
+    ).toString()
   )
 
   override def projectSettings = Seq(
@@ -118,8 +86,9 @@ object SbtTypescript extends AutoPlugin {
     noImplicitAny := false,
     moduleKind := "",
     outFile := "",
-    outDir := "",
+    outDir := ((webTarget in Assets).value / "typescript").absolutePath,
     removeComments := false,
+    JsEngineKeys.parallelism := 1,
     logLevel := Level.Info
 
   ) ++ inTask(typescript)(
@@ -127,19 +96,15 @@ object SbtTypescript extends AutoPlugin {
       inConfig(Assets)(typescriptUnscopedSettings) ++
       inConfig(TestAssets)(typescriptUnscopedSettings) ++
       Seq(
-        moduleName := "javascripts",
-        shellFile := (taskTemporaryDirectory.value / "typescript" / "generatedCompiler.js").asURL,
+        moduleName := "typescript",
+        shellFile := getClass.getClassLoader.getResource("typescriptc.js"),
 
         taskMessage in Assets := "TypeScript compiling",
         taskMessage in TestAssets := "TypeScript test compiling"
       )
   ) ++ SbtJsTask.addJsSourceFileTasks(typescript) ++ Seq(
     typescript in Assets := (typescript in Assets).dependsOn(webModules in Assets).value,
-    typescript in Assets := (typescript in Assets).dependsOn(nodeModules in Assets).value,
-    typescript in Assets := (typescript in Assets).dependsOn(typescriptGenerateCompiler in typescript in Assets).value,
-    typescript in TestAssets := (typescript in TestAssets).dependsOn(webModules in TestAssets).value,
-    typescript in TestAssets := (typescript in TestAssets).dependsOn(nodeModules in TestAssets).value,
-    typescript in TestAssets := (typescript in TestAssets).dependsOn(typescriptGenerateCompiler in typescript in TestAssets).value
+    typescript in TestAssets := (typescript in TestAssets).dependsOn(webModules in TestAssets).value
   )
 
 }

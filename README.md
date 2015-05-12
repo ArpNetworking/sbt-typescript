@@ -7,7 +7,7 @@ typescript compiler.
 To use this plugin use the addSbtPlugin command within your project's plugins.sbt (or as a global setting) i.e.:
 
 ```scala
-addSbtPlugin("com.arpnetworking" % "sbt-typescript" % "0.1.4")
+addSbtPlugin("com.arpnetworking" % "sbt-typescript" % "0.1.5")
 ```
 
 You will also need to enable the SbtWeb plugin in your project.
@@ -19,7 +19,7 @@ Option              | Description
 sourceMap           | Generates source maps for input files.
 sourceRoot          | Specifies the location where the compiler should locate TypeScript files instead of the source locations.
 mapRoot             | Specifies the location where the compiler should locate map files instead of generated locations.
-target              | ECMA script target version. Should be "ES3" (default) or "ES5".
+target              | ECMA script target version. Should be "ES3" or "ES5" (default).
 noImplicitAny       | Warn on expressions and declarations with an implied "any" type.
 moduleKind          | Specifies module code generation. Should be "" (default), "commonjs", or "amd".
 outFile             | Concatenate and emit output to a single file. 
