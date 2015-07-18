@@ -150,13 +150,30 @@
             var sev = "error";
             if (d.category === 0) {
                 sev = "warn";
+            } else if (d.category === 1) {
+                sev = "error";
             } else if (d.category === 2) {
                 sev = "info";
             }
+
+            // Sometimes the messageText is more than a string
+            // In this case, we need to walk the "next" objects and build
+            // the proper message text
+            var messageText = d.messageText;
+            if (typeof d.messageText === "object") {
+                messageText = "";
+                var recurse = d.messageText;
+                while (recurse !== undefined) {
+                    messageText += recurse.messageText + "\n";
+                    recurse = recurse.next;
+                }
+                messageText = messageText.substring(0, messageText.length - 1);
+            }
+
             var problem = {
                 lineNumber: lineCol.line,
                 characterOffset: lineCol.character,
-                message: d.messageText,
+                message: messageText,
                 source: fileName,
                 severity: sev,
                 lineContent: lineText

@@ -33,9 +33,10 @@ object TestBuild extends Build {
 
     def log(level: Level.Value, message: => String): Unit = {
       if (level == Level.Error) {
-        if (message.contains("Type 'number' is not assignable to type 'string'") &&
-          message.contains("bad.ts") && message.contains(":18")) {
-          IO.touch(target / "valid-error")
+        if (message.contains("is not assignable to parameter") &&
+          message.contains("bad.ts") &&
+          message.contains(":24")) {
+            IO.touch(target / "valid-error")
         }
       }
     }
