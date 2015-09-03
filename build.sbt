@@ -19,13 +19,13 @@ organization := "com.arpnetworking"
 
 name := "sbt-typescript"
 
-version := "0.1.6-SNAPSHOT"
+version := "0.1.7-SNAPSHOT"
 
 scalaVersion := "2.10.5"
 
 libraryDependencies ++= Seq(
   "org.webjars" % "mkdirp" % "0.3.5",
-  "org.webjars" % "typescript-node" % "1.5.0-beta",
+  "org.webjars" % "typescript-node" % "1.5.3",
   "com.typesafe" % "jstranspiler" % "1.0.0"
 )
 
