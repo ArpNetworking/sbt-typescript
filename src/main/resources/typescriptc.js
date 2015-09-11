@@ -104,6 +104,11 @@
         return compSettings;
     }
 
+    function replaceFileExtension(file, ext){
+        var oldExt = path.extname(file);
+        return file.substring(0, file.length - oldExt.length) + ext;
+    }
+
     function compile(args) {
         var sourceMaps = args.sourceFileMappings;
         var inputFiles = [];
@@ -111,14 +116,26 @@
         var outputFiles = [];
         var rootDir = "";
         sourceMaps.forEach(function(map) {
-            inputFiles.push(map[0]);
-            var targetOutput = map[1].replace(/\.[^/.]+$/, "") + ".js";
-            outputFiles.push(path.join(args.target, targetOutput));
+            // populate inputFiles
+            // do normalize to replace path separators for user's OS
+            inputFiles.push(path.normalize(map[0]));
 
-            var compilerOutput = map[0].replace(/\.[^/.]+$/, "") + ".js";
-            compilerOutputFiles.push(compilerOutput);
-            rootDir = map[0].substring(0, map[0].length - map[1].length);
+            // populate outputFiles
+            outputFiles.push(path.join(
+                args.target,
+                replaceFileExtension(path.normalize(map[1]), ".js")
+            ));
+
+            // populate compilerOutputFiles
+            compilerOutputFiles.push(replaceFileExtension(path.normalize(map[0]), ".js"));
         });
+
+        // calculate root dir
+        if(sourceMaps.length){
+            var inputFile = path.normalize(sourceMaps[0][0]);
+            var outputFile = path.normalize(sourceMaps[0][1]);
+            rootDir = inputFile.substring(0, inputFile.length - outputFile.length);
+        }
 
         logger.debug("starting compilation of " + inputFiles);
         var opt = args.options;
@@ -208,7 +225,8 @@
         var sourceFiles = program.getSourceFiles();
         logger.debug("got some source files");
         sourceFiles.forEach(function (sourceFile) {
-            var index = inputFiles.indexOf(sourceFile.fileName);
+            // have to normalize path due to different OS path separators
+            var index = inputFiles.indexOf(path.normalize(sourceFile.fileName));
             if (index === -1) {
                 logger.debug("did not find source file " + sourceFile.fileName + " in list compile list, assuming library or dependency and skipping output");
                 return;
