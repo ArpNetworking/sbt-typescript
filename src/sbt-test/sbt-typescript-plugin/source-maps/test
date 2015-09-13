@@ -1,0 +1,9 @@
+# when sourceMap := true
+# map file should be generated and placed along with js in public folder
+
+> assets
+$ exists target/web/public/main/javascripts/main.js
+$ exists target/web/public/main/javascripts/main.js.map
+
+# validate source map
+> checkSourceEquals target/web/public/main/javascripts/main.js.map main.ts

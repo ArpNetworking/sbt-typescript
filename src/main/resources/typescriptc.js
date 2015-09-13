@@ -109,6 +109,19 @@
         return file.substring(0, file.length - oldExt.length) + ext;
     }
 
+    function fixSourceMapFile(file){
+        /*
+        All source .ts files are copied to public folder and reside there side by side with generated .js and js.map files.
+        It means that source maps root at runtime is always '.' and 'sources' array should contain only file name.
+        */
+
+        var sourceMap = JSON.parse(fs.readFileSync(file, 'utf-8'));
+        sourceMap.sources = sourceMap.sources.map(function(source){
+            return path.basename(source);
+        });
+        fs.writeFileSync(file, JSON.stringify(sourceMap), 'utf-8');
+    }
+
     function compile(args) {
         var sourceMaps = args.sourceFileMappings;
         var inputFiles = [];
@@ -246,7 +259,21 @@
                 });
             }
 
-            var result = {source: file, result: {filesRead: deps, filesWritten: [outputFiles[index]]}};
+            var outputFile = outputFiles[index];
+            var outputFileMap = outputFile + ".map";
+
+            if(options.sourceMap){
+                // alter source map file to change a thing
+                fixSourceMapFile(outputFileMap);
+            }
+
+            var result = {
+                source: file,
+                result: {
+                    filesRead: deps,
+                    filesWritten: options.sourceMap ? [outputFile, outputFileMap] : [outputFile]
+                }
+            };
             output.results.push(result);
         });
         logger.debug("output=" + JSON.stringify(output));
