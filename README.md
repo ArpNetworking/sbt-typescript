@@ -7,7 +7,7 @@ typescript compiler.
 To use this plugin use the addSbtPlugin command within your project's plugins.sbt (or as a global setting) i.e.:
 
 ```scala
-addSbtPlugin("com.arpnetworking" % "sbt-typescript" % "0.1.5")
+addSbtPlugin("com.arpnetworking" % "sbt-typescript" % "0.1.8")
 ```
 
 You will also need to enable the SbtWeb plugin in your project.
