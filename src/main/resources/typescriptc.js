@@ -95,6 +95,13 @@
             compSettings.codeGenTarget = 2;
         }
 
+        if (options.jsx.toLowerCase() == "preserve") {
+	    // this is the default option in the compiler
+            compSettings.jsx = 1;
+        } else if (options.jsx.toLowerCase() == "react") {
+            compSettings.jsx = 2;
+        }
+
         compSettings.out = options.outFile;
         compSettings.outDir = options.outDir;
         compSettings.removeComments = options.removeComments;

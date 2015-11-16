@@ -25,8 +25,9 @@ moduleKind          | Specifies module code generation. Should be "" (default), 
 outFile             | Concatenate and emit output to a single file. 
 outDir              | Destination directory for output files.
 removeComments      | Removes comments from the generated source.
+jsx                 | Specifices JSX-mode for .tsx files. Should be "preserve" (default) to generate .jsx or "react" to generate .js files.
     
-By default, all typescript files (*.ts) are included in the compilation and will generate corresponding javascript
+By default, all typescript files (*.ts and *.tsx) are included in the compilation and will generate corresponding javascript
 files.  To change this, supply an includeFilter in the TypescriptKeys.typescript task configuration.
 
 For example:

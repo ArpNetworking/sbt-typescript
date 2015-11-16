@@ -37,6 +37,7 @@ object Import {
     val moduleKind = SettingKey[String]("typescript-module", "Specify module code generation: 'commonjs' or 'amd'.")
     val outFile = SettingKey[String]("typescript-output-file", "Concatenate and emit output to a single file.")
     val outDir = SettingKey[String]("typescript-output-directory", "Redirect output structure to the directory.")
+    val jsx = SettingKey[String]("typescript-jsx-mode", "Specify JSX mode for .tsx files: 'preserve' (default) or 'react'.")
     val removeComments = SettingKey[Boolean]("typescript-remove-comments", "Remove comments from output.")
   }
 }
@@ -56,7 +57,7 @@ object SbtTypescript extends AutoPlugin {
 
   val typescriptUnscopedSettings = Seq(
 
-    includeFilter in typescript := GlobFilter("*.ts"),
+    includeFilter in typescript := GlobFilter("*.ts") | GlobFilter("*.tsx"),
     excludeFilter in typescript := GlobFilter("*.d.ts"),
 
     sources in typescript := (sourceDirectories.value ** ((includeFilter in typescript).value -- (excludeFilter in typescript).value)).get,
@@ -72,6 +73,7 @@ object SbtTypescript extends AutoPlugin {
       "outFile" -> JsString(outFile.value),
       "outDir" -> JsString(outDir.value),
       "removeComments" -> JsBoolean(removeComments.value),
+      "jsx" -> JsString(jsx.value),
       "logLevel" -> JsString(logLevel.value.toString)
 
     ).toString()
@@ -88,6 +90,7 @@ object SbtTypescript extends AutoPlugin {
     outFile := "",
     outDir := ((webTarget in Assets).value / "typescript").absolutePath,
     removeComments := false,
+    jsx := "preserve",
     JsEngineKeys.parallelism := 1,
     logLevel := Level.Info
 
