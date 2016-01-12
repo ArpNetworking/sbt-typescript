@@ -77,6 +77,7 @@
         var compSettings = new typescript.getDefaultCompilerOptions();
         logger.debug("instantiated");
 
+        compSettings.declaration = options.declaration;
         compSettings.sourceMap = options.sourceMap;
         compSettings.sourceRoot = options.sourceRoot;
         compSettings.mapRoot = options.mapRoot;
@@ -269,16 +270,24 @@
             var outputFile = outputFiles[index];
             var outputFileMap = outputFile + ".map";
 
+            var filesWritten = [outputFile];
+
+            if (options.declaration) {
+                var outputFileDeclaration = replaceFileExtension(outputFile, ".d.ts");
+                filesWritten.push(outputFileDeclaration);
+            }
+
             if(options.sourceMap){
                 // alter source map file to change a thing
                 fixSourceMapFile(outputFileMap);
+                filesWritten.push(outputFileMap);
             }
 
             var result = {
                 source: file,
                 result: {
                     filesRead: deps,
-                    filesWritten: options.sourceMap ? [outputFile, outputFileMap] : [outputFile]
+                    filesWritten: filesWritten
                 }
             };
             output.results.push(result);

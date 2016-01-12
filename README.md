@@ -16,6 +16,7 @@ The options provided mimic the arguments to the tsc command line compiler.
 
 Option              | Description
 --------------------|------------
+declaration         | Generates corresponding '.d.ts' file.
 sourceMap           | Generates source maps for input files.
 sourceRoot          | Specifies the location where the compiler should locate TypeScript files instead of the source locations.
 mapRoot             | Specifies the location where the compiler should locate map files instead of generated locations.
