@@ -1,9 +1,18 @@
-sbt-typescript  [![Build Status](https://travis-ci.org/ArpNetworking/sbt-typescript.svg?branch=master)](https://travis-ci.org/ArpNetworking/sbt-typescript)
+sbt-typescript  
+==============
+
+<a href="https://raw.githubusercontent.com/ArpNetworking/sbt-typescript/master/LICENSE">
+    <img src="https://img.shields.io/hexpm/l/plug.svg"
+         alt="License: Apache 2">
+</a>
+<a href="https://travis-ci.org/ArpNetworking/sbt-typescript/">
+    <img src="https://travis-ci.org/ArpNetworking/sbt-typescript.png"
+         alt="Travis Build">
+</a>
 <a href="http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.arpnetworking%22%20a%3A%22sbt-typescript%22">
     <img src="https://img.shields.io/maven-central/v/com.arpnetworking/sbt-typescript.svg"
          alt="Maven Artifact">
 </a>
-========
 
 Allows TypeScript to be used from within sbt. Leverages the functionality of com.typesafe.sbt:js-engine to run the 
 typescript compiler.
