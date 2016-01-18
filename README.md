@@ -1,4 +1,8 @@
 sbt-typescript  [![Build Status](https://travis-ci.org/ArpNetworking/sbt-typescript.svg?branch=master)](https://travis-ci.org/ArpNetworking/sbt-typescript)
+<a href="http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.arpnetworking%22%20a%3A%22sbt-typescript%22">
+    <img src="https://img.shields.io/maven-central/v/com.arpnetworking/sbt-typescript.svg"
+         alt="Maven Artifact">
+</a>
 ========
 
 Allows TypeScript to be used from within sbt. Leverages the functionality of com.typesafe.sbt:js-engine to run the 
@@ -7,7 +11,7 @@ typescript compiler.
 To use this plugin use the addSbtPlugin command within your project's plugins.sbt (or as a global setting) i.e.:
 
 ```scala
-addSbtPlugin("com.arpnetworking" % "sbt-typescript" % "0.1.9")
+addSbtPlugin("com.arpnetworking" % "sbt-typescript" % "0.1.10")
 ```
 
 You will also need to enable the SbtWeb plugin in your project.
