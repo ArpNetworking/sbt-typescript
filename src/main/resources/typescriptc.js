@@ -82,10 +82,20 @@
         compSettings.sourceRoot = options.sourceRoot;
         compSettings.mapRoot = options.mapRoot;
 
-        if (options.moduleKind.toLowerCase() == "amd") {
-            compSettings.module = 2;
-        } else if (options.moduleKind.toLowerCase() == "commonjs") {
+	// we should check if we can 
+	// compSettings.module = typescript.ModuleKind[options.moduleKind];
+        if (options.moduleKind.toLowerCase() == "commonjs") {
             compSettings.module = 1;
+        } else if (options.moduleKind.toLowerCase() == "amd") {
+            compSettings.module = 2;
+        } else if (options.moduleKind.toLowerCase() == "umd") {
+            compSettings.module = 3;
+        } else if (options.moduleKind.toLowerCase() == "system") {
+            compSettings.module = 4;
+        } else if (options.moduleKind.toLowerCase() == "es6") {
+            compSettings.module = 5;
+        } else if (options.moduleKind.toLowerCase() == "es2015") {
+            compSettings.module = 5;
         }
 
         if (options.target.toLowerCase() == "es3") {
@@ -93,6 +103,10 @@
         } else if (options.target.toLowerCase() == "es5") {
             compSettings.codeGenTarget = 1;
         } else if (options.target.toLowerCase() == "es6") {
+            compSettings.codeGenTarget = 2;
+        } else if (options.target.toLowerCase() == "es2015") {
+            compSettings.codeGenTarget = 2;
+        } else if (options.target.toLowerCase() == "latest") {
             compSettings.codeGenTarget = 2;
         }
 
