@@ -33,13 +33,16 @@ object Import {
     val sourceMap = SettingKey[Boolean]("typescript-source-map", "Outputs a source map for typescript files.")
     val sourceRoot = SettingKey[String]("typescript-source-root", "Specifies the location where debugger should locate TypeScript files instead of source locations.")
     val mapRoot = SettingKey[String]("typescript-map-root", "Specifies the location where debugger should locate map files instead of generated locations.")
-    val target = SettingKey[String]("typescript-target", "ECMAScript target version: 'ES3' (default), or 'ES5'.")
+    val target = SettingKey[String]("typescript-target", "ECMAScript target version: 'ES3', 'ES5' (default), 'ES6', 'ES2015', 'Latest'.")
     val noImplicitAny = SettingKey[Boolean]("typescript-no-implicit-any", "Warn on expressions and declarations with an implied 'any' type.")
     val moduleKind = SettingKey[String]("typescript-module", "Specify module code generation: 'commonjs' or 'amd'.")
     val outFile = SettingKey[String]("typescript-output-file", "Concatenate and emit output to a single file.")
     val outDir = SettingKey[String]("typescript-output-directory", "Redirect output structure to the directory.")
-    val jsx = SettingKey[String]("typescript-jsx-mode", "Specify JSX mode for .tsx files: 'preserve' (default) or 'react'.")
+    val jsx = SettingKey[String]("typescript-jsx-mode", "Specify JSX mode for .tsx files: 'Preserve' (default) 'React' or 'None'.")
     val removeComments = SettingKey[Boolean]("typescript-remove-comments", "Remove comments from output.")
+    val experimentalDecorators = SettingKey[Boolean]("--experimentalDecorators", "Experimental support for decorators is a feature that is subject to change in a future release.")
+    val moduleResolutionKind = SettingKey[String]("--moduleResolution", "'NodeJs' or 'Classic'. 'NodeJs' by default")
+    val emitDecoratorMetadata = SettingKey[Boolean]("--emitDecoratorMetadata", "true or false")
   }
 }
 
@@ -76,8 +79,10 @@ object SbtTypescript extends AutoPlugin {
       "outDir" -> JsString(outDir.value),
       "removeComments" -> JsBoolean(removeComments.value),
       "jsx" -> JsString(jsx.value),
-      "logLevel" -> JsString(logLevel.value.toString)
-
+      "logLevel" -> JsString(logLevel.value.toString),
+      "experimentalDecorators" -> JsBoolean(experimentalDecorators.value),
+      "emitDecoratorMetadata" -> JsBoolean(emitDecoratorMetadata.value),
+      "moduleResolutionKind" -> JsString(moduleResolutionKind.value)
     ).toString()
   )
 
@@ -89,14 +94,16 @@ object SbtTypescript extends AutoPlugin {
     mapRoot := "",
     target := "ES5",
     noImplicitAny := false,
-    moduleKind := "",
+    moduleKind := "AMD",
     outFile := "",
     outDir := ((webTarget in Assets).value / "typescript").absolutePath,
     removeComments := false,
-    jsx := "preserve",
+    jsx := "Preserve",
     JsEngineKeys.parallelism := 1,
-    logLevel := Level.Info
-
+    logLevel := Level.Info,
+    experimentalDecorators := false,
+    emitDecoratorMetadata := false,
+    moduleResolutionKind := "NodeJs"
   ) ++ inTask(typescript)(
     SbtJsTask.jsTaskSpecificUnscopedSettings ++
       inConfig(Assets)(typescriptUnscopedSettings) ++

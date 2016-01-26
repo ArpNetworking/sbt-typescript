@@ -81,42 +81,12 @@
         compSettings.sourceMap = options.sourceMap;
         compSettings.sourceRoot = options.sourceRoot;
         compSettings.mapRoot = options.mapRoot;
-
-	// we should check if we can 
-	// compSettings.module = typescript.ModuleKind[options.moduleKind];
-        if (options.moduleKind.toLowerCase() == "commonjs") {
-            compSettings.module = 1;
-        } else if (options.moduleKind.toLowerCase() == "amd") {
-            compSettings.module = 2;
-        } else if (options.moduleKind.toLowerCase() == "umd") {
-            compSettings.module = 3;
-        } else if (options.moduleKind.toLowerCase() == "system") {
-            compSettings.module = 4;
-        } else if (options.moduleKind.toLowerCase() == "es6") {
-            compSettings.module = 5;
-        } else if (options.moduleKind.toLowerCase() == "es2015") {
-            compSettings.module = 5;
-        }
-
-        if (options.target.toLowerCase() == "es3") {
-            compSettings.codeGenTarget = 0;
-        } else if (options.target.toLowerCase() == "es5") {
-            compSettings.codeGenTarget = 1;
-        } else if (options.target.toLowerCase() == "es6") {
-            compSettings.codeGenTarget = 2;
-        } else if (options.target.toLowerCase() == "es2015") {
-            compSettings.codeGenTarget = 2;
-        } else if (options.target.toLowerCase() == "latest") {
-            compSettings.codeGenTarget = 2;
-        }
-
-        if (options.jsx.toLowerCase() == "preserve") {
-	    // this is the default option in the compiler
-            compSettings.jsx = 1;
-        } else if (options.jsx.toLowerCase() == "react") {
-            compSettings.jsx = 2;
-        }
-
+        compSettings.experimentalDecorators = options.experimentalDecorators;
+        compSettings.emitDecoratorMetadata = options.emitDecoratorMetadata;
+        compSettings.moduleResolution = typescript.ModuleResolutionKind[options.moduleResolutionKind];
+        compSettings.module = typescript.ModuleKind[options.moduleKind];
+        compSettings.target = typescript.ScriptTarget[options.target];
+        compSettings.jsx = typescript.JsxEmit[options.jsx];
         compSettings.out = options.outFile;
         compSettings.outDir = options.outDir;
         compSettings.removeComments = options.removeComments;
