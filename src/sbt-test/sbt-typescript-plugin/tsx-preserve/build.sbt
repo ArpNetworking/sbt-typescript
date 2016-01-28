@@ -16,7 +16,7 @@
 
 lazy val root = (project in file(".")).enablePlugins(SbtWeb).settings(
   JsEngineKeys.engineType := JsEngineKeys.EngineType.Node,
-  TypescriptKeys.jsx := "preserve"
+  TypescriptKeys.jsx := "Preserve"
 )
 
 libraryDependencies += "org.webjars" % "bootstrap" % "3.0.2"

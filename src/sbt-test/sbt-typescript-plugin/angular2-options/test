@@ -1,0 +1,5 @@
+# Compile a typescript file
+
+> assets
+> assertContainsText target/web/public/main/javascripts/class-with-decorator.js "var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {"
+> assertContainsText target/web/public/main/javascripts/class-with-decorator.js "var __metadata = (this && this.__metadata) || function (k, v) {"

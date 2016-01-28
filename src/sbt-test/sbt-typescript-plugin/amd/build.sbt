@@ -19,7 +19,7 @@ import com.arpnetworking.sbt.typescript.Import.TypescriptKeys._
 
 lazy val root = (project in file(".")).enablePlugins(SbtWeb).settings(
   JsEngineKeys.engineType := JsEngineKeys.EngineType.Node,
-  moduleKind := "amd"
+  moduleKind := "AMD"
 )
 
 libraryDependencies += "org.webjars" % "bootstrap" % "3.0.2"
