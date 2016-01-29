@@ -1,13 +1,13 @@
 language: scala
 sudo: false
 scala:
-  - 2.10.4
-script: 
+  - 2.11.7
+script:
   - sbt ++$TRAVIS_SCALA_VERSION scripted
 notifications:
   email:
     recipients:
       - brandon@arpnetworking.com
 jdk:
-  - openjdk7
-  - oraclejdk7
+  - openjdk8
+  - oraclejdk8

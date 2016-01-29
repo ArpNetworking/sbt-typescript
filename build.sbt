@@ -21,7 +21,7 @@ name := "sbt-typescript"
 
 version := "0.2.2-SNAPSHOT"
 
-scalaVersion := "2.10.5"
+scalaVersion := "2.10.6"
 
 libraryDependencies ++= Seq(
   "org.webjars" % "mkdirp" % "0.3.5",
