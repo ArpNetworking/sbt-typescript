@@ -20,26 +20,30 @@ typescript compiler.
 To use this plugin use the addSbtPlugin command within your project's plugins.sbt (or as a global setting) i.e.:
 
 ```scala
-addSbtPlugin("com.arpnetworking" % "sbt-typescript" % "0.1.10")
+addSbtPlugin("com.arpnetworking" % "sbt-typescript" % "0.2.0")
 ```
 
 You will also need to enable the SbtWeb plugin in your project.
 
 The options provided mimic the arguments to the tsc command line compiler.
 
-Option              | Description
---------------------|------------
-declaration         | Generates corresponding '.d.ts' file.
-sourceMap           | Generates source maps for input files.
-sourceRoot          | Specifies the location where the compiler should locate TypeScript files instead of the source locations.
-mapRoot             | Specifies the location where the compiler should locate map files instead of generated locations.
-target              | ECMA script target version. Should be "ES3" or "ES5" (default).
-noImplicitAny       | Warn on expressions and declarations with an implied "any" type.
-moduleKind          | Specifies module code generation. Should be "" (default), "commonjs", or "amd".
-outFile             | Concatenate and emit output to a single file. 
-outDir              | Destination directory for output files.
-removeComments      | Removes comments from the generated source.
-jsx                 | Specifices JSX-mode for .tsx files. Should be "preserve" (default) to generate .jsx or "react" to generate .js files.
+Option                 | Description
+-----------------------|------------
+declaration            | Generates corresponding '.d.ts' file.
+sourceMap              | Generates source maps for input files.
+sourceRoot             | Specifies the location where the compiler should locate TypeScript files instead of the source locations.
+mapRoot                | Specifies the location where the compiler should locate map files instead of generated locations.
+target                 | ECMA script target version. Should be "ES3" or "ES5" (default).
+noImplicitAny          | Warn on expressions and declarations with an implied "any" type.
+moduleKind             | Specifies module code generation. Should be "" (default), "None", "CommonJS", "AMD", "UMD", "System", "ES6" and "ES2015".
+outFile                | Concatenate and emit output to a single file. 
+outDir                 | Destination directory for output files.
+removeComments         | Removes comments from the generated source.
+jsx                    | Specifices JSX-mode for .tsx files. Should be "None", "Preserve" (default) to generate .jsx or "React" to generate .js files.
+experimentalDecorators | Experimental decorators support. Set this to true if you have an angular2 project.
+emitDecoratorMetadata  | This will write decorator metadata to your js files. Set this to true if you have an angular2 project.
+moduleResolutionKind   | "NodeJs" or "Classic" module resolution. 
+
     
 By default, all typescript files (*.ts and *.tsx) are included in the compilation and will generate corresponding javascript
 files.  To change this, supply an includeFilter in the TypescriptKeys.typescript task configuration.
