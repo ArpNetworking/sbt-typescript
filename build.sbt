@@ -19,7 +19,7 @@ organization := "com.arpnetworking"
 
 name := "sbt-typescript"
 
-version := "0.2.1-SNAPSHOT"
+version := "0.2.1"
 
 scalaVersion := "2.10.5"
 
