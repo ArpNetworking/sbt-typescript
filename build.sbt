@@ -25,7 +25,7 @@ scalaVersion := "2.10.5"
 
 libraryDependencies ++= Seq(
   "org.webjars" % "mkdirp" % "0.3.5",
-  "org.webjars" % "typescript-node" % "1.7.5",
+  "org.webjars.npm" % "typescript" % "1.8.9",
   "com.typesafe" % "jstranspiler" % "1.0.0"
 )
 
