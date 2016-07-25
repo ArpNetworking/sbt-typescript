@@ -16,6 +16,7 @@
 
 package com.arpnetworking.sbt.typescript
 
+import java.io.File
 import com.typesafe.sbt.jse.JsEngineImport.JsEngineKeys
 import sbt._
 import com.typesafe.sbt.jse.SbtJsTask
@@ -28,6 +29,7 @@ object Import {
   object TypescriptKeys {
     val typescript = TaskKey[Seq[File]]("typescript", "Invoke the typescript compiler.")
     val typescriptGenerateCompiler = TaskKey[File]("generateCompiler", "Generates the typescript compile script.")
+    val cleanTsCache = taskKey[Unit]("Clean after stage task")
 
     val declaration = SettingKey[Boolean]("typescript-declaration", "Generates corresponding '.d.ts' file.")
     val sourceMap = SettingKey[Boolean]("typescript-source-map", "Outputs a source map for typescript files.")
@@ -43,6 +45,7 @@ object Import {
     val experimentalDecorators = SettingKey[Boolean]("--experimentalDecorators", "Experimental support for decorators is a feature that is subject to change in a future release.")
     val moduleResolutionKind = SettingKey[String]("--moduleResolution", "'NodeJs' or 'Classic'. 'NodeJs' by default")
     val emitDecoratorMetadata = SettingKey[Boolean]("--emitDecoratorMetadata", "true or false")
+    val rootDir = SettingKey[String]("rootDir", "The location of the typescript source files")
   }
 }
 
@@ -82,7 +85,8 @@ object SbtTypescript extends AutoPlugin {
       "logLevel" -> JsString(logLevel.value.toString),
       "experimentalDecorators" -> JsBoolean(experimentalDecorators.value),
       "emitDecoratorMetadata" -> JsBoolean(emitDecoratorMetadata.value),
-      "moduleResolutionKind" -> JsString(moduleResolutionKind.value)
+      "moduleResolutionKind" -> JsString(moduleResolutionKind.value),
+      "rootDir" -> JsString(rootDir.value)
     ).toString()
   )
 
@@ -103,7 +107,8 @@ object SbtTypescript extends AutoPlugin {
     logLevel := Level.Info,
     experimentalDecorators := false,
     emitDecoratorMetadata := false,
-    moduleResolutionKind := "NodeJs"
+    moduleResolutionKind := "NodeJs",
+    rootDir := (sourceDirectory in Assets).value.absolutePath
   ) ++ inTask(typescript)(
     SbtJsTask.jsTaskSpecificUnscopedSettings ++
       inConfig(Assets)(typescriptUnscopedSettings) ++
@@ -116,7 +121,18 @@ object SbtTypescript extends AutoPlugin {
         taskMessage in TestAssets := "TypeScript test compiling"
       )
   ) ++ SbtJsTask.addJsSourceFileTasks(typescript) ++ Seq(
-    typescript in Assets := (typescript in Assets).dependsOn(webModules in Assets).value,
+    cleanTsCache := {
+      println("Clean typescript cache")
+      val fileToDelete = baseDirectory.value / "target" / "web" / "typescript"
+      def delete(f: File) {
+        if (f.isDirectory) {
+          f.listFiles().foreach(c => delete(c))
+        }
+        f.delete()
+      }
+      delete(fileToDelete)
+    },
+    typescript in Assets := (typescript in Assets).dependsOn(cleanTsCache).dependsOn(webModules in Assets).value,
     typescript in TestAssets := (typescript in TestAssets).dependsOn(webModules in TestAssets).value
   )
 

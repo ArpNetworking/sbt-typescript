@@ -117,9 +117,9 @@
     function compile(args) {
         var sourceMaps = args.sourceFileMappings;
         var inputFiles = [];
-        var compilerOutputFiles = [];
         var outputFiles = [];
-        var rootDir = "";
+        var opt = args.options;
+
         sourceMaps.forEach(function(map) {
             // populate inputFiles
             // do normalize to replace path separators for user's OS
@@ -130,23 +130,10 @@
                 args.target,
                 replaceFileExtension(path.normalize(map[1]), ".js")
             ));
-
-            // populate compilerOutputFiles
-            compilerOutputFiles.push(replaceFileExtension(path.normalize(map[0]), ".js"));
         });
 
-        // calculate root dir
-        if(sourceMaps.length){
-            var inputFile = path.normalize(sourceMaps[0][0]);
-            var outputFile = path.normalize(sourceMaps[0][1]);
-            rootDir = inputFile.substring(0, inputFile.length - outputFile.length);
-        }
-
         logger.debug("starting compilation of " + inputFiles);
-        var opt = args.options;
-        opt.rootDir = rootDir;
         opt.outDir = args.target;
-        //compilationResult contains the compiled source and the dependencies
         var options = createCompilerSettings(opt);
         logger.debug("options = " + JSON.stringify(options));
         var compilerHost = typescript.createCompilerHost(options);
