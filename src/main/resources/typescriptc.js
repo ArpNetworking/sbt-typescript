@@ -91,6 +91,9 @@
         compSettings.outDir = options.outDir;
         compSettings.removeComments = options.removeComments;
         compSettings.rootDir = options.rootDir;
+        compSettings.baseUrl = options.baseUrl;
+        compSettings.traceResolution = options.traceResolution;
+        compSettings.paths = options.paths;
         logger.debug("settings created");
 
         return compSettings;

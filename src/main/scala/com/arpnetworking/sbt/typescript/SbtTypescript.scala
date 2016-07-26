@@ -22,7 +22,7 @@ import sbt._
 import com.typesafe.sbt.jse.SbtJsTask
 import com.typesafe.sbt.web.SbtWeb
 import sbt.Keys._
-import spray.json.{JsString, JsBoolean, JsObject}
+import spray.json.{JsString, JsBoolean, JsObject, JsArray}
 
 object Import {
 
@@ -46,6 +46,9 @@ object Import {
     val moduleResolutionKind = SettingKey[String]("--moduleResolution", "'NodeJs' or 'Classic'. 'NodeJs' by default")
     val emitDecoratorMetadata = SettingKey[Boolean]("--emitDecoratorMetadata", "true or false")
     val rootDir = SettingKey[String]("rootDir", "The location of the typescript source files")
+    val baseUrl = SettingKey[String]("--baseUrl", "A directory where the compiler should look for modules")
+    val traceResolution = SettingKey[Boolean]("--traceResolution", "Offers a handy way to understand how modules have been resolved by the compiler")
+    val paths = SettingKey[Map[String, Seq[String]]]("paths", "Will map one path to another")
   }
 }
 
@@ -86,7 +89,10 @@ object SbtTypescript extends AutoPlugin {
       "experimentalDecorators" -> JsBoolean(experimentalDecorators.value),
       "emitDecoratorMetadata" -> JsBoolean(emitDecoratorMetadata.value),
       "moduleResolutionKind" -> JsString(moduleResolutionKind.value),
-      "rootDir" -> JsString(rootDir.value)
+      "rootDir" -> JsString(rootDir.value),
+      "baseUrl" -> JsString(baseUrl.value),
+      "traceResolution" -> JsBoolean(traceResolution.value),
+      "paths" -> JsObject(mapToJs(paths.value))
     ).toString()
   )
 
@@ -108,7 +114,10 @@ object SbtTypescript extends AutoPlugin {
     experimentalDecorators := false,
     emitDecoratorMetadata := false,
     moduleResolutionKind := "NodeJs",
-    rootDir := (sourceDirectory in Assets).value.absolutePath
+    rootDir := (sourceDirectory in Assets).value.absolutePath,
+    baseUrl := ((webJarsDirectory in Assets).value / "lib").absolutePath,
+    traceResolution := false,
+    paths := Map()
   ) ++ inTask(typescript)(
     SbtJsTask.jsTaskSpecificUnscopedSettings ++
       inConfig(Assets)(typescriptUnscopedSettings) ++
@@ -136,4 +145,7 @@ object SbtTypescript extends AutoPlugin {
     typescript in TestAssets := (typescript in TestAssets).dependsOn(webModules in TestAssets).value
   )
 
+  private def mapToJs(value: Map[String, Seq[String]]): Map[String, JsArray] = {
+    value.map((f) => f._1 -> JsArray(f._2.map(a => JsString(a)): _*))
+  }
 }

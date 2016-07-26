@@ -9,5 +9,4 @@ notifications:
     recipients:
       - brandon@arpnetworking.com
 jdk:
-  - openjdk7
-  - oraclejdk7
+  - oraclejdk8

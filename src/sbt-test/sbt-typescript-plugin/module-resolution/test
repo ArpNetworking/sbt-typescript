@@ -1,0 +1,4 @@
+# Compile a typescript file
+
+> typescript
+$ exists target/web/typescript/main/javascripts/file-with-imports.js
