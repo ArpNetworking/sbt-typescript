@@ -14,6 +14,9 @@
 // limitations under the License.
 //
 import ReleaseTransformations._
+import com.typesafe.sbt.pgp.PgpKeys._
+import com.typesafe.sbt.pgp.PgpKeys.useGpg
+import com.typesafe.sbt.pgp.PgpKeys.pgpPassphrase
 
 sbtPlugin := true
 
