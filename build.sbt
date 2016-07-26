@@ -13,13 +13,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
+import ReleaseTransformations._
+
 sbtPlugin := true
 
 organization := "com.arpnetworking"
 
 name := "sbt-typescript"
-
-version := "0.2.2-SNAPSHOT"
 
 scalaVersion := "2.10.5"
 
@@ -79,3 +79,25 @@ scriptedSettings
 scriptedLaunchOpts <+= version apply { v => s"-Dproject.version=$v" }
 
 scriptedBufferLog := false
+
+credentials += Credentials("Sonatype Nexus Repository Manager",
+        "oss.sonatype.org",
+        System.getenv("OSSRH_USER"),
+        System.getenv("OSSRH_PASS"))
+
+useGpg := true
+
+pgpPassphrase in Global := Option(System.getenv("GPG_PASS")).map(_.toCharArray)
+
+sonatypeProfileName := "com.arpnetworking"
+
+releaseProcess := Seq[ReleaseStep](
+    checkSnapshotDependencies,
+    inquireVersions,
+    runTest,
+    setReleaseVersion,
+    commitReleaseVersion,
+    tagRelease,
+    setNextVersion,
+    commitNextVersion,
+    pushChanges)

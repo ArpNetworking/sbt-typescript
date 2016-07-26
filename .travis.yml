@@ -1,12 +1,24 @@
 language: scala
 sudo: false
 scala:
-  - 2.10.4
-script: 
-  - sbt ++$TRAVIS_SCALA_VERSION scripted
+- 2.10.4
+before_script:
+- gpg --import arpnetworking.key
+- if [ \( -n "${TRAVIS_TAG}" \) -a  "${TRAVIS_PULL_REQUEST}" = "false" ]; then export TARGET="${TARGET} publishSigned sonatypeRelease"; fi;
+script:
+- sbt ++$TRAVIS_SCALA_VERSION ${TARGET}
 notifications:
   email:
     recipients:
-      - brandon@arpnetworking.com
+    - brandon@arpnetworking.com
 jdk:
-  - oraclejdk8
+- oraclejdk8
+cache:
+  directories:
+  - $HOME/.ivy2
+env:
+  global:
+  - TARGET="scripted"
+  - secure: hklUQPMKJln+5wfS6Widn7ppJkPy3SrXAB5QMObUphjWgVxQjo/yz/VvwEri5Bg/qJUJxNpW6DqhZCio6vtXnWvFUeGsdg5Ct68IfoiVbr+K3SxtfgQ8JY4r8dojJyO3XaefDgIhw3L9JjUcQgr9lQuMrKHHXLUWmjbSsF4R1PU=
+  - secure: L7FtmAVhj7uUaO3PiBl6qKSqTy/hfmS7SFc41Ij9NDe/q24fni12lbA7AS2yB/Bkb2m9oArWyPNH63nbCm10j7QOiVWf4KBfnIxR0qZolgqiNHMpSZEecBLenJQ8/VSaV3/1/ZC27MqZqu11aObYer9e3nunovxbOKoJ4dY9spY=
+  - secure: lNo69KFF/PPupFUY+0rV1I+OvM0UU/7dKXe3V2c+30YWE5Am3vSRZCheUvj9YlkYNBHwl+oC6ZCLCojRLKgKf1MS6DjF278DiSTw6cSP6GRRbQVjrbGH97dlIebzkwg0ChuAzP0j1DLgmqYbx9BZ0AIHaeqhwy0ozJjIZvVvi40=
