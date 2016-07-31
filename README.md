@@ -21,6 +21,7 @@ To use this plugin use the addSbtPlugin command within your project's plugins.sb
 
 ```scala
 addSbtPlugin("com.arpnetworking" % "sbt-typescript" % "0.2.1")
+resolvers += Resolver.typesafeRepo("releases")
 ```
 
 You will also need to enable the SbtWeb plugin in your project.
