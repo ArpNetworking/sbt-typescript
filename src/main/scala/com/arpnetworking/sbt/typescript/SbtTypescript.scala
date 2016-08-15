@@ -22,7 +22,7 @@ import sbt._
 import com.typesafe.sbt.jse.SbtJsTask
 import com.typesafe.sbt.web.SbtWeb
 import sbt.Keys._
-import spray.json.{JsString, JsBoolean, JsObject, JsArray}
+import spray.json.{JsValue, JsNull, JsString, JsBoolean, JsObject, JsArray}
 
 object Import {
 
@@ -37,7 +37,7 @@ object Import {
     val mapRoot = SettingKey[String]("typescript-map-root", "Specifies the location where debugger should locate map files instead of generated locations.")
     val target = SettingKey[String]("typescript-target", "ECMAScript target version: 'ES3', 'ES5' (default), 'ES6', 'ES2015', 'Latest'.")
     val noImplicitAny = SettingKey[Boolean]("typescript-no-implicit-any", "Warn on expressions and declarations with an implied 'any' type.")
-    val moduleKind = SettingKey[String]("typescript-module", "Specify module code generation: 'commonjs' or 'amd'.")
+    val moduleKind = SettingKey[String]("typescript-module", "Specify module code generation: 'Commonjs', 'AMD' or 'System'.")
     val outFile = SettingKey[String]("typescript-output-file", "Concatenate and emit output to a single file.")
     val outDir = SettingKey[String]("typescript-output-directory", "Redirect output structure to the directory.")
     val jsx = SettingKey[String]("typescript-jsx-mode", "Specify JSX mode for .tsx files: 'Preserve' (default) 'React' or 'None'.")
@@ -49,6 +49,8 @@ object Import {
     val baseUrl = SettingKey[String]("--baseUrl", "A directory where the compiler should look for modules")
     val traceResolution = SettingKey[Boolean]("--traceResolution", "Offers a handy way to understand how modules have been resolved by the compiler")
     val paths = SettingKey[Map[String, Seq[String]]]("paths", "Will map one path to another")
+    val allowJS = SettingKey[Boolean]("typescript-allow-js", "Allow JavaScript files to be compiled")
+    val typingsFile = SettingKey[Option[File]]("typescript-typings-file", "A file that refers to typings that the build needs. Default None.")
   }
 }
 
@@ -67,7 +69,13 @@ object SbtTypescript extends AutoPlugin {
 
   val typescriptUnscopedSettings = Seq(
 
-    includeFilter in typescript := GlobFilter("*.ts") | GlobFilter("*.tsx"),
+    includeFilter in typescript := (
+      if (allowJS.value) {
+        GlobFilter("*.ts") | GlobFilter("*.tsx") | GlobFilter("*.js") | GlobFilter("*.jsx")
+      } else {
+        GlobFilter("*.ts") | GlobFilter("*.tsx")
+      }
+    ),
     excludeFilter in typescript := GlobFilter("*.d.ts"),
 
     sources in typescript := (sourceDirectories.value ** ((includeFilter in typescript).value -- (excludeFilter in typescript).value)).get,
@@ -92,7 +100,9 @@ object SbtTypescript extends AutoPlugin {
       "rootDir" -> JsString(rootDir.value),
       "baseUrl" -> JsString(baseUrl.value),
       "traceResolution" -> JsBoolean(traceResolution.value),
-      "paths" -> JsObject(mapToJs(paths.value))
+      "paths" -> JsObject(mapToJs(paths.value)),
+      "allowJs" → JsBoolean(allowJS.value),
+      "typingsFile" → typingsFile.value.fold[JsValue](JsNull)(f ⇒ JsString(f.absolutePath))
     ).toString()
   )
 
@@ -117,7 +127,9 @@ object SbtTypescript extends AutoPlugin {
     rootDir := (sourceDirectory in Assets).value.absolutePath,
     baseUrl := ((webJarsDirectory in Assets).value / "lib").absolutePath,
     traceResolution := false,
-    paths := Map()
+    paths := Map(),
+    allowJS := false,
+    typingsFile := None
   ) ++ inTask(typescript)(
     SbtJsTask.jsTaskSpecificUnscopedSettings ++
       inConfig(Assets)(typescriptUnscopedSettings) ++

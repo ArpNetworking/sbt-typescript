@@ -1,0 +1,6 @@
+# Compile a typescript file
+
+> assets
+> assertMatches target/web/public/main/app.js expected/app.js
+> assertMatches target/web/public/main/app.js.map expected/app.js.map
+

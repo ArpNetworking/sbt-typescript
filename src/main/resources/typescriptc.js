@@ -77,6 +77,13 @@
         var compSettings = new typescript.getDefaultCompilerOptions();
         logger.debug("instantiated");
 
+        // If the out put exists and is not an absolute path, assume it's meant to go into
+        // the output directory rather than in the root of the SBT project!
+        var outFile = options.outFile;
+        if (outFile && outFile[0] !== '/') {
+            outFile = options.outDir + '/' + outFile;
+        }
+
         compSettings.declaration = options.declaration;
         compSettings.sourceMap = options.sourceMap;
         compSettings.sourceRoot = options.sourceRoot;
@@ -87,13 +94,14 @@
         compSettings.module = typescript.ModuleKind[options.moduleKind];
         compSettings.target = typescript.ScriptTarget[options.target];
         compSettings.jsx = typescript.JsxEmit[options.jsx];
-        compSettings.out = options.outFile;
+        compSettings.out = outFile;
         compSettings.outDir = options.outDir;
         compSettings.removeComments = options.removeComments;
         compSettings.rootDir = options.rootDir;
         compSettings.baseUrl = options.baseUrl;
         compSettings.traceResolution = options.traceResolution;
         compSettings.paths = options.paths;
+        compSettings.allowJs = options.allowJs;
         logger.debug("settings created");
 
         return compSettings;
@@ -104,7 +112,12 @@
         return file.substring(0, file.length - oldExt.length) + ext;
     }
 
-    function fixSourceMapFile(file){
+    function fixSourceMapFile(opt, file){
+        if (opt.sourceRoot) {
+            // If we have a defined sourceRoot, we don't need to "fix" anything
+            return;
+        }
+
         /*
         All source .ts files are copied to public folder and reside there side by side with generated .js and js.map files.
         It means that source maps root at runtime is always '.' and 'sources' array should contain only file name.
@@ -120,6 +133,7 @@
     function compile(args) {
         var sourceMaps = args.sourceFileMappings;
         var inputFiles = [];
+        var filesToCompile = inputFiles;
         var outputFiles = [];
         var opt = args.options;
 
@@ -135,14 +149,39 @@
             ));
         });
 
+        if (opt.typingsFile) {
+            filesToCompile = inputFiles.concat(opt.typingsFile);
+        }
+
         logger.debug("starting compilation of " + inputFiles);
         opt.outDir = args.target;
         var options = createCompilerSettings(opt);
         logger.debug("options = " + JSON.stringify(options));
         var compilerHost = typescript.createCompilerHost(options);
-        var program = typescript.createProgram(inputFiles, options, compilerHost);
+        var program = typescript.createProgram(filesToCompile, options, compilerHost);
 
         var output = {results: [], problems: []};
+
+        var createFilesWrittenArray = function(outputFile) {
+            var filesWritten = [];
+
+            var outputFileMap = outputFile + ".map";
+
+            filesWritten.push(outputFile);
+
+            if (options.declaration) {
+                var outputFileDeclaration = replaceFileExtension(outputFile, ".d.ts");
+                filesWritten.push(outputFileDeclaration);
+            }
+
+            if(options.sourceMap){
+                // alter source map file to change a thing
+                fixSourceMapFile(opt, outputFileMap);
+                filesWritten.push(outputFileMap);
+            }
+
+            return filesWritten;
+        };
 
 
         var recordDiagnostic = function (d) {
@@ -242,20 +281,9 @@
             }
 
             var outputFile = outputFiles[index];
-            var outputFileMap = outputFile + ".map";
 
-            var filesWritten = [outputFile];
-
-            if (options.declaration) {
-                var outputFileDeclaration = replaceFileExtension(outputFile, ".d.ts");
-                filesWritten.push(outputFileDeclaration);
-            }
-
-            if(options.sourceMap){
-                // alter source map file to change a thing
-                fixSourceMapFile(outputFileMap);
-                filesWritten.push(outputFileMap);
-            }
+            // Only record this written files if we are not creating a single output file
+            var filesWritten = (options.out) ? [] : createFilesWrittenArray(outputFile);
 
             var result = {
                 source: file,
@@ -266,6 +294,17 @@
             };
             output.results.push(result);
         });
+
+        // If we are outputting a single file create the array of written files
+        //  and map it against all input files
+        if (options.out) {
+            var filesWritten = createFilesWrittenArray(options.out);
+
+            output.results.forEach(function(file) {
+                file.result.filesWritten = filesWritten;
+            });
+        }
+
         logger.debug("output=" + JSON.stringify(output));
         return output;
     }
