@@ -14,10 +14,6 @@
 #| limitations under the License.
 #|
 # Compile a typescript file
-
-> assets
--$ exists target/web/typescript/main/javascripts/main.d.ts
-> set TypescriptKeys.declaration := true
 > assets
 $ exists target/web/typescript/main/javascripts/main.d.ts
 

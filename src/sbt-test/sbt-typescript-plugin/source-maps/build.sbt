@@ -3,9 +3,7 @@ import java.nio.file.Files
 import play.api.libs.json._
 import sbt.complete.DefaultParsers._
 
-lazy val root = (project in file(".")).enablePlugins(SbtWeb).settings(
-  TypescriptKeys.sourceMap := true
-)
+lazy val root = (project in file(".")).enablePlugins(SbtWeb)
 
 lazy val checkSourceEquals = inputKey[Unit]("Validates source map source. First arg: source map path. Second arg: source file path.")
 

@@ -35,7 +35,7 @@ object TestBuild extends Build {
       if (level == Level.Error) {
         if (message.contains("is not assignable to parameter") &&
           message.contains("bad.ts") &&
-          message.contains(":24")) {
+          message.contains(":25")) {
             IO.touch(target / "valid-error")
         }
       }

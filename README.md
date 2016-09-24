@@ -26,7 +26,7 @@ resolvers += Resolver.typesafeRepo("releases")
 
 You will also need to enable the SbtWeb plugin in your project.
 
-The options provided mimic the arguments to the tsc command line compiler.
+The options provided mimic the arguments to the tsc command line compiler (for the versions < 0.3.0).
 
 Option                 | Description
 -----------------------|------------
@@ -47,17 +47,36 @@ emitDecoratorMetadata  | This will write decorator metadata to your js files. Se
 moduleResolutionKind   | "NodeJs" or "Classic" module resolution.
 typingsFile            | A file that refers to typings that the build needs. Default None, but would normally be "/typings/index.d.ts"
 
+tsconfig.json support (version >= 0.3.0)
+----------------------------------------
+
+From the version 0.3.0 you can define typescript settings only with a tsconfig.json file. The sbt-typescript will look for a tsconfig.file in the assets
+directory by default. If there is no file, an error would occur.
 
 By default, all typescript files (*.ts and *.tsx) are included in the compilation and will generate corresponding javascript
 files.  To change this, supply an includeFilter in the TypescriptKeys.typescript task configuration.
 
-For example:
+The supported sbt settings are:
+
+Option                 | Description
+-----------------------|------------
+configFile             | By default the sbt-typescript will look into the assets directory (app/assets/tsconfig.json). If you want sbt-typescript look into the root folder, just set this property to 'yourconfigname.json'
+sourceRoot             | Specifies the location where debugger should locate TypeScript files instead of source locations.
+
+include and exclude, baseUrl properties of tsconfig are not supported.
+
+
+For including specific files of your project you can write something like:
 
 ```scala
-includeFilter in TypescriptKeys.typescript := "myFile.ts"
+includeFilter in (Assets, typescript) := GlobFilter("myFile.ts")
 ```
 
-You can also set an exclude filter in the same way.
+You can also set an exclude filter in the same way:
+
+```scala
+excludeFilter in (Assets,typescript) := GlobFilter("*.d.ts") | GlobFilter("*.spec.ts") | GlobFilter("**/typings")
+```
 
 A note on typescript compiling speed
 ------------------------------------

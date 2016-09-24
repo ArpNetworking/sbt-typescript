@@ -1,3 +1,4 @@
+///<reference path="../../../../typings/index.d.ts"/>
 import {upperCase} from './util/string'; // TS file in another folder (testing source maps)
 import {log} from './util/logger'; // Legacy JS file
 

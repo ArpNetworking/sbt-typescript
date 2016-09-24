@@ -6,11 +6,7 @@ import sbt.complete.DefaultParsers._
 
 
 lazy val root = (project in file(".")).enablePlugins(SbtWeb).settings(
-  JsEngineKeys.engineType := JsEngineKeys.EngineType.Node,
-  moduleKind := "System",
-  experimentalDecorators := true,
-  emitDecoratorMetadata := true,
-  moduleResolutionKind := "NodeJs"
+  JsEngineKeys.engineType := JsEngineKeys.EngineType.Node
 )
 
 lazy val assertContainsText = inputKey[Unit]("")

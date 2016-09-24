@@ -14,299 +14,245 @@
  * limitations under the License.
  */
 
-/* global process, require */
+class Logger {
+    constructor(logLevel) {
+        this.logLevel = logLevel;
+    }
 
-(function () {
+    debug(message) {
+        if (this.logLevel === 'debug') {
+            console.log(message);
+        }
+    }
+
+    info(message) {
+        if (this.logLevel === 'debug' || this.logLevel === 'info') {
+            console.log(message);
+        }
+    }
+
+    warn(message) {
+        if (this.logLevel === 'debug' || this.logLevel === 'info' || this.logLevel === 'warn') {
+            console.log(message);
+        }
+    }
+
+    error(message, error) {
+        if (this.logLevel === 'debug' || this.logLevel === 'info' || this.logLevel === 'warn' || this.logLevel === 'error') {
+            if (error !== undefined) {
+                var errorMessage = error.message;
+                if (error.fileName !== undefined) {
+                    errorMessage = errorMessage + " in " + error.fileName;
+                }
+                if (error.lineNumber !== undefined) {
+                    errorMessage = errorMessage + " at line " + error.lineNumber;
+                }
+                console.log(message + " " + errorMessage);
+            } else {
+                console.log(message);
+            }
+        }
+    }
+}
+
+/* global process, require */
+(() => {
 
     "use strict";
 
-    var fs = require('fs');
-    var mkdirp = require("mkdirp");
-    var jst = require("jstranspiler");
-    var typescript = require("typescript");
-    var when = require("when");
-    var path = require("path");
+    const fs = require('fs');
+    const jst = require("jstranspiler");
+    const typescript = require("typescript");
+    const path = require("path");
+    const args = jst.args(process.argv);
+    const logger = new Logger(args.options.logLevel);
+    const problemSeverities = ['warn', 'error', 'info'];
 
-    var args = jst.args(process.argv);
-    var logger = makeLogger(args.options.logLevel);
-    logger.debug("starting compile");
     logger.debug("args=" + JSON.stringify(args));
 
-    function makeLogger (logLevel) {
-        var that = {};
-        that.debug = function (message) {
-            if (logLevel === 'debug') {
-                console.log(message);
-            }
-        };
+    let getTSConfig = (options) => {
+        let configFilePath = path.join(options.projectBase, options.configFile);
+        let configJson = JSON.parse(fs.readFileSync(configFilePath, 'utf-8'));
+        let configDir = path.dirname(configFilePath);
+        let configFileName = path.basename(configFilePath);
 
-        that.info = function (message) {
-            if (logLevel === 'debug' || logLevel === 'info') {
-                console.log(message);
-            }
-        };
+        return typescript.parseJsonConfigFileContent(
+            configJson, typescript.sys, configDir, {}, configFileName
+        );
+    };
 
-        that.warn = function (message) {
-            if (logLevel === 'debug' || logLevel === 'info' || logLevel === 'warn') {
-                console.log(message);
-            }
-        };
-
-        that.error = function (message, error) {
-            if (logLevel === 'debug' || logLevel === 'info' || logLevel === 'warn' || logLevel === 'error') {
-                if (error !== undefined) {
-                    var errorMessage = error.message;
-                    if (error.fileName !== undefined) {
-                        errorMessage = errorMessage + " in " + error.fileName;
-                    }
-                    if (error.lineNumber !== undefined) {
-                        errorMessage = errorMessage + " at line " + error.lineNumber;
-                    }
-                    console.log(message + " " + errorMessage);
-                } else {
-                    console.log(message);
-                }
-            }
-        };
-
-        return that;
-    }
-
-    function createCompilerSettings(options) {
+    let createCompilerSettings = (args) => {
         logger.debug("creating compiler settings");
-        var compSettings = new typescript.getDefaultCompilerOptions();
-        logger.debug("instantiated");
+        let config = getTSConfig(args.options);
+        let compSettings = config.options;
 
-        // If the out put exists and is not an absolute path, assume it's meant to go into
-        // the output directory rather than in the root of the SBT project!
-        var outFile = options.outFile;
-        if (outFile && outFile[0] !== '/') {
-            outFile = options.outDir + '/' + outFile;
-        }
-
-        compSettings.declaration = options.declaration;
-        compSettings.sourceMap = options.sourceMap;
-        compSettings.sourceRoot = options.sourceRoot;
-        compSettings.mapRoot = options.mapRoot;
-        compSettings.experimentalDecorators = options.experimentalDecorators;
-        compSettings.emitDecoratorMetadata = options.emitDecoratorMetadata;
-        compSettings.moduleResolution = typescript.ModuleResolutionKind[options.moduleResolutionKind];
-        compSettings.module = typescript.ModuleKind[options.moduleKind];
-        compSettings.target = typescript.ScriptTarget[options.target];
-        compSettings.jsx = typescript.JsxEmit[options.jsx];
-        compSettings.out = outFile;
-        compSettings.outDir = options.outDir;
-        compSettings.removeComments = options.removeComments;
-        compSettings.rootDir = options.rootDir;
-        compSettings.baseUrl = options.baseUrl;
-        compSettings.traceResolution = options.traceResolution;
-        compSettings.paths = options.paths;
-        compSettings.allowJs = options.allowJs;
-        logger.debug("settings created");
+        compSettings.rootDir = args.options.rootDir;
+        compSettings.baseUrl = args.options.baseUrl;
+        compSettings.outDir = args.target;
+        compSettings.sourceRoot = args.options.sourceRoot;
 
         return compSettings;
-    }
+    };
 
-    function replaceFileExtension(file, ext){
+    let replaceFileExtension = (file, ext) => {
         var oldExt = path.extname(file);
         return file.substring(0, file.length - oldExt.length) + ext;
-    }
+    };
 
-    function fixSourceMapFile(opt, file){
-        if (opt.sourceRoot) {
-            // If we have a defined sourceRoot, we don't need to "fix" anything
-            return;
-        }
-
+    let fixSourceMapFile = (file) => {
         /*
-        All source .ts files are copied to public folder and reside there side by side with generated .js and js.map files.
-        It means that source maps root at runtime is always '.' and 'sources' array should contain only file name.
-        */
+         All source .ts files are copied to public folder and reside there side by side with generated .js and js.map files.
+         It means that source maps root at runtime is always '.' and 'sources' array should contain only file name.
+         */
+        let sourceMap = JSON.parse(fs.readFileSync(file, 'utf-8'));
+        sourceMap.sources = sourceMap.sources.map((source) => path.basename(source));
 
-        var sourceMap = JSON.parse(fs.readFileSync(file, 'utf-8'));
-        sourceMap.sources = sourceMap.sources.map(function(source){
-            return path.basename(source);
-        });
         fs.writeFileSync(file, JSON.stringify(sourceMap), 'utf-8');
-    }
+    };
 
-    function compile(args) {
-        var sourceMaps = args.sourceFileMappings;
-        var inputFiles = [];
-        var filesToCompile = inputFiles;
-        var outputFiles = [];
-        var opt = args.options;
+    let prepareMessageText = (diagnostic) => {
+        let messageText = diagnostic.messageText;
 
-        sourceMaps.forEach(function(map) {
-            // populate inputFiles
-            // do normalize to replace path separators for user's OS
-            inputFiles.push(path.normalize(map[0]));
-
-            // populate outputFiles
-            outputFiles.push(path.join(
-                args.target,
-                replaceFileExtension(path.normalize(map[1]), ".js")
-            ));
-        });
-
-        if (opt.typingsFile) {
-            filesToCompile = inputFiles.concat(opt.typingsFile);
+        // Sometimes the messageText is more than a string
+        // In this case, we need to walk the "next" objects and build
+        // the proper message text
+        if (typeof diagnostic.messageText === "object") {
+            messageText = "";
+            let recurse = diagnostic.messageText;
+            while (recurse !== undefined) {
+                messageText += recurse.messageText + "\n";
+                recurse = recurse.next;
+            }
+            messageText = messageText.substring(0, messageText.length - 1);
         }
 
-        logger.debug("starting compilation of " + inputFiles);
-        opt.outDir = args.target;
-        var options = createCompilerSettings(opt);
-        logger.debug("options = " + JSON.stringify(options));
-        var compilerHost = typescript.createCompilerHost(options);
-        var program = typescript.createProgram(filesToCompile, options, compilerHost);
+        return messageText;
+    };
 
-        var output = {results: [], problems: []};
-
-        var createFilesWrittenArray = function(outputFile) {
-            var filesWritten = [];
-
-            var outputFileMap = outputFile + ".map";
-
-            filesWritten.push(outputFile);
-
-            if (options.declaration) {
-                var outputFileDeclaration = replaceFileExtension(outputFile, ".d.ts");
-                filesWritten.push(outputFileDeclaration);
-            }
-
-            if(options.sourceMap){
-                // alter source map file to change a thing
-                fixSourceMapFile(opt, outputFileMap);
-                filesWritten.push(outputFileMap);
-            }
-
-            return filesWritten;
-        };
-
-
-        var recordDiagnostic = function (d) {
-            logger.debug("recording diagnostic");
-            var lineCol = {line: 0, character: 0};
-            var fileName = "Global";
-            var lineText = "";
-            if (d.file) {
-                lineCol = d.file.getLineAndCharacterOfPosition(d.start);
-
-                var lineStart = d.file.getLineStarts()[lineCol.line];
-                var lineEnd = d.file.getLineStarts()[lineCol.line + 1];
-                lineText = d.file.text.substring(lineStart, lineEnd);
-                fileName = d.file.fileName;
-            }
-
-            var sev = "error";
-            if (d.category === 0) {
-                sev = "warn";
-            } else if (d.category === 1) {
-                sev = "error";
-            } else if (d.category === 2) {
-                sev = "info";
-            }
-
-            // Sometimes the messageText is more than a string
-            // In this case, we need to walk the "next" objects and build
-            // the proper message text
-            var messageText = d.messageText;
-            if (typeof d.messageText === "object") {
-                messageText = "";
-                var recurse = d.messageText;
-                while (recurse !== undefined) {
-                    messageText += recurse.messageText + "\n";
-                    recurse = recurse.next;
-                }
-                messageText = messageText.substring(0, messageText.length - 1);
-            }
-
-            var problem = {
-                lineNumber: lineCol.line,
-                characterOffset: lineCol.character,
-                message: messageText,
-                source: fileName,
-                severity: sev,
-                lineContent: lineText
-            };
-            logger.debug("diagnostic recorded");
-            output.problems.push(problem);
-        };
-
-        var recordDiagnostics = function(diagnostics) {
-            diagnostics.forEach(function(diagnostic) {
-                recordDiagnostic(diagnostic);
-            });
-        };
-
-        logger.debug("compiler created");
-
-        logger.debug("looking for global diagnostics");
-        var diagnostics = program.getSyntacticDiagnostics();
-        recordDiagnostics(diagnostics);
-        if (diagnostics.length === 0) {
-            diagnostics = program.getGlobalDiagnostics();
-            recordDiagnostics(diagnostics);
-            if (diagnostics.length === 0) {
-                diagnostics = program.getSemanticDiagnostics();
-                recordDiagnostics(diagnostics);
-            }
+    let createProblem = (diagnostic, lineCol = {line: 0, character: 0}, fileName = 'Global', lineText = '') => {
+        logger.debug("recording diagnostic");
+        let diagnosticFile = diagnostic.file;
+        if (diagnosticFile) {
+            lineCol = diagnosticFile.getLineAndCharacterOfPosition(diagnostic.start);
+            let lineStart = diagnosticFile.getLineStarts()[lineCol.line];
+            let lineEnd = diagnosticFile.getLineStarts()[lineCol.line + 1];
+            lineText = diagnosticFile.text.substring(lineStart, lineEnd);
+            fileName = diagnosticFile.fileName;
         }
 
-        var emitOutput = program.emit();
-        recordDiagnostics(emitOutput.diagnostics);
+        return {
+            lineNumber: lineCol.line + 1,
+            characterOffset: lineCol.character,
+            message: prepareMessageText(diagnostic),
+            source: fileName,
+            severity: problemSeverities[diagnostic.category],
+            lineContent: lineText
+        };
+    };
 
-        var sourceFiles = program.getSourceFiles();
-        logger.debug("got some source files");
-        sourceFiles.forEach(function (sourceFile) {
-            // have to normalize path due to different OS path separators
-            var index = inputFiles.indexOf(path.normalize(sourceFile.fileName));
-            if (index === -1) {
-                logger.debug("did not find source file " + sourceFile.fileName + " in list compile list, assuming library or dependency and skipping output");
-                return;
+    let createFilesWrittenArray = (outputFile, compilerSettings) => {
+        let filesWritten = [];
+
+        let outputFileMap = outputFile + ".map";
+
+        filesWritten.push(outputFile);
+        if (compilerSettings.declaration) {
+            let outputFileDeclaration = replaceFileExtension(outputFile, ".d.ts");
+            filesWritten.push(outputFileDeclaration);
+        }
+
+        if (compilerSettings.sourceMap) {
+            if (!args.options.sourceRoot) {
+                fixSourceMapFile(outputFileMap);
             }
+
+            filesWritten.push(outputFileMap);
+        }
+
+        return filesWritten;
+    };
+
+    let findDependencies = (sourceFile) => {
+        let depFiles = sourceFile.referencedFiles;
+        let deps = [sourceFile.fileName];
+
+        if (depFiles !== undefined && depFiles.length > 0) {
+            deps.concat(depFiles.map((dep) => dep.fileName));
+        }
+
+        return deps;
+    };
+
+    let getResults = (sourceFiles, compilerSettings, inputFiles, outputFiles) => {
+        let filesWrittenForSingleFile = [];
+        if (compilerSettings.outFile) {
+            filesWrittenForSingleFile = createFilesWrittenArray(compilerSettings.outFile, compilerSettings);
+        }
+
+        let createResult = (sourceFile) => {
             logger.debug("examining " + sourceFile.fileName);
-            logger.debug("looking for deps");
-            var depFiles = sourceFile.referencedFiles;
+            let index = inputFiles.indexOf(path.normalize(sourceFile.fileName));
+            let outputFile = outputFiles[index];
+            let filesWritten = (compilerSettings.outFile) ? filesWrittenForSingleFile : createFilesWrittenArray(outputFile, compilerSettings);
 
-            var file = sourceFile.fileName;
-            var deps = [sourceFile.fileName];
-
-            if (depFiles !== undefined) {
-                logger.debug("got some deps: " + depFiles);
-                depFiles.forEach(function (dep) {
-                    logger.debug("found referenced file " + dep.fileName);
-                    deps.push(dep.fileName);
-                });
-            }
-
-            var outputFile = outputFiles[index];
-
-            // Only record this written files if we are not creating a single output file
-            var filesWritten = (options.out) ? [] : createFilesWrittenArray(outputFile);
-
-            var result = {
-                source: file,
+            return {
+                source: sourceFile.fileName,
                 result: {
-                    filesRead: deps,
+                    filesRead: findDependencies(sourceFile),
                     filesWritten: filesWritten
                 }
             };
-            output.results.push(result);
-        });
+        };
 
-        // If we are outputting a single file create the array of written files
-        //  and map it against all input files
-        if (options.out) {
-            var filesWritten = createFilesWrittenArray(options.out);
+        return sourceFiles.map(createResult);
+    };
 
-            output.results.forEach(function(file) {
-                file.result.filesWritten = filesWritten;
-            });
+    let getRelativePath = (base, fileName) => {
+        return fileName.replace(base, '');
+    };
+
+    let getProgramDiagnostics = (program, emitOutput) => {
+        let diagnostics = program.getSyntacticDiagnostics();
+        if (diagnostics.length === 0) {
+            diagnostics = program.getGlobalDiagnostics();
+            if (diagnostics.length === 0) {
+                diagnostics = program.getSemanticDiagnostics();
+            }
         }
 
-        logger.debug("output=" + JSON.stringify(output));
-        return output;
+        return diagnostics.concat(emitOutput.diagnostics);
+    };
+
+    let createCompiler = (sources, compilerSettings) => {
+        logger.debug("createProgram with  " + sources);
+        return typescript.createProgram(sources, compilerSettings, typescript.createCompilerHost(compilerSettings));
+    };
+
+    let getOutputFileName = (compilerSettings, fileName) => {
+        let relativeFilePath = getRelativePath(compilerSettings.rootDir, fileName);
+
+        return path.join(compilerSettings.outDir, replaceFileExtension(path.normalize(relativeFilePath), ".js"));
+    };
+
+    function compile(args) {
+        let compilerSettings = createCompilerSettings(args);
+        logger.debug("compilerSettings = " + JSON.stringify(compilerSettings));
+
+        let compiler = createCompiler(args.options.sources, compilerSettings);
+        let compilerOutput = compiler.emit();
+
+        let diagnostics = getProgramDiagnostics(compiler, compilerOutput);
+
+        let inputFiles = args.sourceFileMappings.map((pair) => pair[0]);
+        let outputFiles = inputFiles.map((fileName) => getOutputFileName(compilerSettings, fileName));
+
+        let sourceFiles = compiler.getSourceFiles()
+            .filter((sourceFile) => inputFiles.includes(path.normalize(sourceFile.fileName)));
+
+        return {
+            results: getResults(sourceFiles, compilerSettings, inputFiles, outputFiles),
+            problems: diagnostics.map(createProblem)
+        };
     }
 
     console.log("\u0010" + JSON.stringify(compile(args)));
