@@ -88,7 +88,7 @@ class Logger {
 
         compSettings.rootDir = args.options.rootDir;
         compSettings.baseUrl = args.options.baseUrl;
-        compSettings.outDir = args.target;
+        compSettings.outDir = !compSettings.outDir ? args.target : compSettings.outDir;
         compSettings.sourceRoot = args.options.sourceRoot;
 
         return compSettings;
