@@ -4,6 +4,8 @@ libraryDependencies <+= (sbtVersion) { sv =>
 
 resolvers += Resolver.typesafeRepo("releases")
 
+addSbtPlugin("com.arpnetworking" % "sbt-typescript" % "0.3.1")
+
 addSbtPlugin("com.github.gseitz" % "sbt-release" % "1.0.3")
 
 addSbtPlugin("org.xerial.sbt" % "sbt-sonatype" % "1.1")

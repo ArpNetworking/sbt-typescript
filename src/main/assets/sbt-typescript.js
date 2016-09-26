@@ -247,7 +247,7 @@ class Logger {
         let outputFiles = inputFiles.map((fileName) => getOutputFileName(compilerSettings, fileName));
 
         let sourceFiles = compiler.getSourceFiles()
-            .filter((sourceFile) => inputFiles.includes(path.normalize(sourceFile.fileName)));
+            .filter((sourceFile) => inputFiles.indexOf(path.normalize(sourceFile.fileName)) > -1);
 
         return {
             results: getResults(sourceFiles, compilerSettings, inputFiles, outputFiles),

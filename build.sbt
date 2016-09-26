@@ -14,9 +14,12 @@
 // limitations under the License.
 //
 import ReleaseTransformations._
-import com.typesafe.sbt.pgp.PgpKeys._
+import com.arpnetworking.sbt.typescript.Import.TypescriptKeys._
+import com.typesafe.sbt.jse.JsEngineImport.JsEngineKeys.EngineType
 import com.typesafe.sbt.pgp.PgpKeys.useGpg
 import com.typesafe.sbt.pgp.PgpKeys.pgpPassphrase
+import sbt.Keys._
+import sbt.ScriptedPlugin._
 
 sbtPlugin := true
 
@@ -25,6 +28,8 @@ organization := "com.arpnetworking"
 name := "sbt-typescript"
 
 scalaVersion := "2.10.5"
+
+lazy val root = (project in file(".")).enablePlugins(SbtWeb)
 
 libraryDependencies ++= Seq(
   "org.webjars.npm" % "typescript" % "2.0.2",
@@ -42,6 +47,10 @@ resolvers ++= Seq(
 addSbtPlugin("com.typesafe.sbt" %% "sbt-js-engine" % "1.1.3")
 
 scalacOptions += "-feature"
+
+configFile := "tsconfig.json"
+
+includeFilter in (Assets, typescript) := GlobFilter("*.js")
 
 publishMavenStyle := true
 
@@ -76,11 +85,18 @@ pomExtra := (
       </developer>
     </developers>)
 
+
 scriptedSettings
 
 scriptedLaunchOpts <+= version apply { v => s"-Dproject.version=$v" }
 
 scriptedBufferLog := false
+
+scriptedDependencies <<= scriptedDependencies.dependsOn(typescript in Assets).map((u) => u)
+
+publish <<= publish.dependsOn(typescript in Assets).map((u) => u)
+
+publishLocal <<= publishLocal.dependsOn(typescript in Assets).map((u) => u)
 
 credentials += Credentials("Sonatype Nexus Repository Manager",
         "oss.sonatype.org",
@@ -90,6 +106,7 @@ credentials += Credentials("Sonatype Nexus Repository Manager",
 useGpg := true
 
 pgpPassphrase in Global := Option(System.getenv("GPG_PASS")).map(_.toCharArray)
+
 
 sonatypeProfileName := "com.arpnetworking"
 
