@@ -70,7 +70,6 @@ object SbtTypescript extends AutoPlugin {
   def relative(base: String, fullPath: String): String = fullPath.replace(base, "")
 
   override def projectSettings = {
-    println("define project Settings")
     Seq(
       JsEngineKeys.parallelism := 1,
       sourceRoot := "",

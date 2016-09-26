@@ -15,7 +15,6 @@
 //
 import ReleaseTransformations._
 import com.arpnetworking.sbt.typescript.Import.TypescriptKeys._
-import com.typesafe.sbt.jse.JsEngineImport.JsEngineKeys.EngineType
 import com.typesafe.sbt.pgp.PgpKeys.useGpg
 import com.typesafe.sbt.pgp.PgpKeys.pgpPassphrase
 import sbt.Keys._
@@ -50,9 +49,11 @@ scalacOptions += "-feature"
 
 configFile := "tsconfig.json"
 
-includeFilter in (Assets, typescript) := GlobFilter("*.js")
+includeFilter in (Assets, typescript) := GlobFilter("*.js") | GlobFilter("*.ts")
 
 publishMavenStyle := true
+
+resourceDirectory in Compile := baseDirectory.value / "target" / "sbt-typescript"
 
 publishTo := {
   val nexus = "https://oss.sonatype.org/"
