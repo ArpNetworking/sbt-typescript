@@ -1,4 +1,4 @@
-///<reference path="define.ts"/>
+import {sbtts} from './types/sbt-ts';
 
 export class Logger {
   logLevel: sbtts.LogLevel;

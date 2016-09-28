@@ -1,10 +1,7 @@
-///<reference path="logger.ts"/>
-///<reference path="types/node.d.ts"/>
-///<reference path="types/sbt-web.d.ts"/>
-///<reference path="types/sbt-ts.d.ts"/>
-///<reference path="types/ts.d.ts"/>
-
 import {Logger} from './logger';
+import {sbtts} from './types/sbt-ts';
+import {sbtweb} from './types/sbt-web';
+import {ts} from './types/ts';
 
 export class TypescriptCompiler {
   private problemSeverities: sbtweb.Severity[] = ['warn', 'error', 'info'];

@@ -1,10 +1,10 @@
-declare namespace ts {
-  interface LineAndCharacter {
+export namespace ts {
+  export interface LineAndCharacter {
     line: number
     character: number
   }
 
-  interface DiagnosticFile {
+  export interface DiagnosticFile {
     fileName: string;
     text: string;
     getLineAndCharacterOfPosition(start: number): LineAndCharacter;
@@ -12,7 +12,7 @@ declare namespace ts {
 
   }
 
-  interface Diagnostic {
+  export interface Diagnostic {
     category: number;
     start: number;
     file: DiagnosticFile;
@@ -20,7 +20,7 @@ declare namespace ts {
     messageText: Diagnostic | string;
   }
 
-  interface CompilerOptions {
+  export interface CompilerOptions {
     sourceRoot?: string;
     baseUrl?: string;
     outDir?: string;
@@ -30,12 +30,12 @@ declare namespace ts {
     declaration?: boolean;
   }
 
-  interface SourceFile {
+  export interface SourceFile {
     fileName: string;
     referencedFiles: SourceFile[];
   }
 
-  interface Program {
+  export interface Program {
     getSyntacticDiagnostics(): Diagnostic[];
     getGlobalDiagnostics(): Diagnostic[];
     getSemanticDiagnostics(): Diagnostic[];
@@ -43,11 +43,11 @@ declare namespace ts {
     getSourceFiles(): SourceFile[];
   }
 
-  interface EmitOutput {
+  export interface EmitOutput {
     diagnostics: Diagnostic[];
   }
 
-  interface TypescriptApi {
+  export interface TypescriptApi {
     sys: any;
     parseJsonConfigFileContent(json: any, host: ParseConfigHost, basePath: string,
                                existingOptions?: CompilerOptions, configFileName?: string,
@@ -56,19 +56,19 @@ declare namespace ts {
     createProgram(sources: string[], compilerOptions: CompilerOptions, compilerHost: CompilerHost): Program;
   }
 
-  interface CompilerHost {
+  export interface CompilerHost {
 
   }
 
-  interface ParsedCommandLine {
+  export interface ParsedCommandLine {
     options: CompilerOptions;
   }
 
-  interface ParseConfigHost {
+  export interface ParseConfigHost {
 
   }
 
-  interface Path {
+  export interface Path {
 
   }
 }

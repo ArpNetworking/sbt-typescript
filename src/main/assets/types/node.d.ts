@@ -85,6 +85,7 @@ declare namespace node {
   }
 }
 
+declare var require: node.NodeRequire;
+
 declare var process: node.Process;
 
-declare var require: node.NodeRequire;

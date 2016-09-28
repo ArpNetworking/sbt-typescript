@@ -1,7 +1,7 @@
-declare namespace sbtweb {
-  type Severity = 'warn' | 'error' | 'info';
+export namespace sbtweb {
+  export type Severity = 'warn' | 'error' | 'info';
 
-  interface Problem {
+  export interface Problem {
     lineNumber: number;
     characterOffset: number;
     source: string;
@@ -10,23 +10,23 @@ declare namespace sbtweb {
     message: string;
   }
 
-  interface Arguments<T> {
+  export interface Arguments<T> {
     sourceFileMappings: string[][];
     target: string;
     options: T;
   }
 
-  interface CompilerOutput {
+  export interface CompilerOutput {
     results: CompilationResult[];
     problems: Problem[];
   }
 
-  interface FileResult {
+  export interface FileResult {
     filesRead: string[];
     filesWritten: string[];
   }
 
-  interface CompilationResult {
+  export interface CompilationResult {
     source: string;
     result: FileResult
   }

@@ -1,7 +1,7 @@
-declare namespace sbtts {
-  type LogLevel = 'debug' | 'info' | 'warn' | 'error';
+export namespace sbtts {
+  export type LogLevel = 'debug' | 'info' | 'warn' | 'error';
 
-  interface Options {
+  export interface Options {
     logLevel: LogLevel;
     sources: string[];
     sourceRoot: string;
@@ -11,7 +11,7 @@ declare namespace sbtts {
     projectBase: string;
   }
 
-  interface Map {
+  export interface Map {
     [key: string]: string;
   }
 }
