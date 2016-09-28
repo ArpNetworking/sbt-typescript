@@ -1,10 +1,10 @@
-declare namespace node {
-  interface fs {
+export namespace node {
+  export interface fs {
     readFileSync(fileName: string, encoding: string): string;
     writeFileSync(fileName: string, content: string, encoding: string): void;
   }
 
-  interface path {
+  export interface path {
     join(first: string, second: string): string;
     dirname(path: string): string;
     basename(path: string): string;
@@ -12,11 +12,11 @@ declare namespace node {
     normalize(path: string): string;
   }
 
-  interface NodeRequireFunction {
+  export interface NodeRequireFunction {
     (id: string): any;
   }
 
-  interface NodeRequire extends NodeRequireFunction {
+  export interface NodeRequire extends NodeRequireFunction {
     resolve(id: string): string;
     cache: any;
     extensions: any;
@@ -84,8 +84,3 @@ declare namespace node {
     connected: boolean;
   }
 }
-
-declare var require: node.NodeRequire;
-
-declare var process: node.Process;
-

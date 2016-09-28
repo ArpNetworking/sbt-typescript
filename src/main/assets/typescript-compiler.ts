@@ -2,6 +2,7 @@ import {Logger} from './logger';
 import {sbtts} from './types/sbt-ts';
 import {sbtweb} from './types/sbt-web';
 import {ts} from './types/ts';
+import {node} from './types/node';
 
 export class TypescriptCompiler {
   private problemSeverities: sbtweb.Severity[] = ['warn', 'error', 'info'];
