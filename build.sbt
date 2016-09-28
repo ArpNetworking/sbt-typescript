@@ -30,6 +30,12 @@ scalaVersion := "2.10.5"
 
 lazy val root = (project in file(".")).enablePlugins(SbtWeb)
 
+pipelineStages := Seq(concat)
+
+Concat.groups := Seq(
+  "public/main/typescript.js" -> group(Seq("logger.js", "typescript-compiler.js", "shell-file.js"))
+)
+
 libraryDependencies ++= Seq(
   "org.webjars.npm" % "typescript" % "2.0.2",
   "com.typesafe" % "jstranspiler" % "1.0.0"
