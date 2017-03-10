@@ -15,5 +15,6 @@
  */
 
 var t: string = "";
+var num: number = 10;
 
-t = 10;
+t = num;
