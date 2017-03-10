@@ -54,7 +54,8 @@ From the version 0.3.0 you can define typescript settings only with a tsconfig.j
 directory by default. If there is no file, an error would occur.
 
 By default, all typescript files (*.ts and *.tsx) are included in the compilation and will generate corresponding javascript
-files.  To change this, supply an includeFilter in the TypescriptKeys.typescript task configuration.
+files. In addition, if source map generation is enabled, the .ts and .tsx files will be copied to the output directory in 
+order to make source maps work.  To change this, supply an includeFilter in the TypescriptKeys.typescript task configuration.
 
 The supported sbt settings are:
 
