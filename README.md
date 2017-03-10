@@ -20,7 +20,7 @@ typescript compiler.
 To use this plugin use the addSbtPlugin command within your project's plugins.sbt (or as a global setting) i.e.:
 
 ```scala
-addSbtPlugin("com.arpnetworking" % "sbt-typescript" % "0.2.3")
+addSbtPlugin("com.arpnetworking" % "sbt-typescript" % "0.3.3")
 resolvers += Resolver.typesafeRepo("releases")
 ```
 
