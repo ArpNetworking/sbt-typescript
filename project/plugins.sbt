@@ -4,7 +4,7 @@ libraryDependencies <+= (sbtVersion) { sv =>
 
 resolvers += Resolver.typesafeRepo("releases")
 
-addSbtPlugin("com.arpnetworking" % "sbt-typescript" % "0.3.1")
+addSbtPlugin("com.arpnetworking" % "sbt-typescript" % "0.3.3")
 
 addSbtPlugin("com.github.gseitz" % "sbt-release" % "1.0.3")
 
