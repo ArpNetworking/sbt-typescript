@@ -31,7 +31,7 @@ scalaVersion := "2.10.5"
 lazy val root = (project in file(".")).enablePlugins(SbtWeb)
 
 libraryDependencies ++= Seq(
-  "org.webjars.npm" % "typescript" % "2.2.1",
+  "org.webjars.npm" % "typescript" % "2.2.2",
   "com.typesafe" % "jstranspiler" % "1.0.0"
 )
 
