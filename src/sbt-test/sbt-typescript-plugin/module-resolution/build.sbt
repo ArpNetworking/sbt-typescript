@@ -11,6 +11,6 @@ lazy val root = (project in file(".")).enablePlugins(SbtWeb).settings(
 )
 
 libraryDependencies ++= Seq(
-  "org.webjars.npm" % "rxjs" % "5.0.0-beta.10",
+  "org.webjars.npm" % "rxjs" % "5.5.5",
   "org.webjars.npm" % "angular__core" % "2.0.0-rc.4"
 )
