@@ -8,7 +8,7 @@ before_script:
 - gpg --import arpnetworking.key
 - if [ \( -n "${TRAVIS_TAG}" \) -a  "${TRAVIS_PULL_REQUEST}" = "false" ]; then export TARGET="${TARGET} publishSigned sonatypeRelease"; fi;
 script:
-- sbt ++$TRAVIS_SCALA_VERSION ${TARGET}
+- ./jdk-wrapper.sh ./sbt ++$TRAVIS_SCALA_VERSION ${TARGET}
 notifications:
   email:
     recipients:

@@ -1,6 +1,6 @@
-libraryDependencies <+= (sbtVersion) { sv =>
+libraryDependencies += (sbtVersion) { sv =>
   "org.scala-sbt" % "scripted-plugin" % sv
-}
+}.value
 
 resolvers += Resolver.typesafeRepo("releases")
 
