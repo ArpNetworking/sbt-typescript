@@ -27,7 +27,8 @@ organization := "com.arpnetworking"
 name := "sbt-typescript"
 
 scalaVersion := "2.10.7"
-crossScalaVersions := Seq("2.11.12", "2.12.5")
+crossScalaVersions := Seq("2.10.7", "2.11.12", "2.12.5")
+crossSbtVersions := Seq("0.13.17", "1.0.4")
 
 lazy val root = (project in file(".")).enablePlugins(SbtWeb)
 
