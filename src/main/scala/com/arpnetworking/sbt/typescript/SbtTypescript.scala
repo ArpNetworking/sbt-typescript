@@ -77,7 +77,8 @@ object SbtTypescript extends AutoPlugin {
       logLevel := Level.Info,
       configFile := relative(baseDirectory.value.absolutePath, ((sourceDirectory in Assets).value / "tsconfig.json").absolutePath)
     ) ++ inTask(typescript)(
-      SbtJsTask.jsTaskSpecificUnscopedProjectSettingsSettings ++
+      SbtJsTask.jsTaskSpecificUnscopedProjectSettings ++
+        SbtJsTask.jsTaskSpecificUnscopedBuildSettings ++
         inConfig(Assets)(typescriptUnscopedSettings) ++
         inConfig(TestAssets)(typescriptUnscopedSettings) ++
         Seq(
