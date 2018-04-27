@@ -18,7 +18,7 @@ package com.arpnetworking.sbt.typescript
 import java.io.File
 
 import com.typesafe.sbt.jse.JsEngineImport.JsEngineKeys
-import sbt._
+import sbt.{Def, _}
 import com.typesafe.sbt.jse.SbtJsTask
 import com.typesafe.sbt.web.SbtWeb
 import sbt.Keys._
@@ -26,6 +26,7 @@ import spray.json.{JsArray, JsObject, JsString}
 import SbtWeb.autoImport._
 import WebKeys._
 import SbtJsTask.autoImport.JsTaskKeys._
+import sbt.util.Level
 
 
 object Import {
@@ -35,14 +36,14 @@ object Import {
     val typescriptGenerateCompiler = TaskKey[File]("generateCompiler", "Generates the typescript compile script.")
 
     val sourceRoot = SettingKey[String]("typescript-source-root", "Specifies the location where debugger should locate TypeScript files instead of source locations.")
-    val configFile = SettingKey[String]("Name of a config file", "By default the sbt-typescript will look into the assets directory")
+    val configFile = SettingKey[String]("config-file", "Name of the config file. By default the sbt-typescript will look into the assets directory")
   }
 
 }
 
 object SbtTypescript extends AutoPlugin {
 
-  override def requires = SbtJsTask
+  override def requires: SbtJsTask.type = SbtJsTask
 
   override def trigger = AllRequirements
 
@@ -69,14 +70,14 @@ object SbtTypescript extends AutoPlugin {
 
   def relative(base: String, fullPath: String): String = fullPath.replace(base, "")
 
-  override def projectSettings = {
+  override def projectSettings: Seq[Def.Setting[_ >: Int with String with Level.Value with Task[Seq[File]]]] = {
     Seq(
       JsEngineKeys.parallelism := 1,
       sourceRoot := "",
       logLevel := Level.Info,
       configFile := relative(baseDirectory.value.absolutePath, ((sourceDirectory in Assets).value / "tsconfig.json").absolutePath)
     ) ++ inTask(typescript)(
-      SbtJsTask.jsTaskSpecificUnscopedSettings ++
+      SbtJsTask.jsTaskSpecificUnscopedProjectSettingsSettings ++
         inConfig(Assets)(typescriptUnscopedSettings) ++
         inConfig(TestAssets)(typescriptUnscopedSettings) ++
         Seq(
