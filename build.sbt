@@ -26,9 +26,7 @@ organization := "com.arpnetworking"
 
 name := "sbt-typescript"
 
-scalaVersion := "2.10.7"
-crossScalaVersions := Seq("2.10.7", "2.11.12", "2.12.5")
-crossSbtVersions := Seq("0.13.17", "1.0.4")
+scalaVersion := "2.12.5"
 
 lazy val root = (project in file(".")).enablePlugins(SbtWeb)
 
@@ -45,7 +43,7 @@ resolvers ++= Seq(
   "Typesafe Snapshots Repository" at "http://repo.typesafe.com/typesafe/snapshots/"
 )
 
-addSbtPlugin("com.typesafe.sbt" %% "sbt-js-engine" % "1.1.3")
+addSbtPlugin("com.typesafe.sbt" %% "sbt-js-engine" % "1.2.2")
 
 scalacOptions += "-feature"
 
@@ -89,17 +87,16 @@ pomExtra := (
     </developers>)
 
 
-scriptedSettings
 
-scriptedLaunchOpts <+= version apply { v => s"-Dproject.version=$v" }
+scriptedLaunchOpts += { version apply { v => s"-Dproject.version=$v" } }.value
 
 scriptedBufferLog := false
 
-scriptedDependencies <<= scriptedDependencies.dependsOn(typescript in Assets).map((u) => u)
+scriptedDependencies := scriptedDependencies.dependsOn(typescript in Assets).map((u) => u).value
 
-publish <<= publish.dependsOn(typescript in Assets).map((u) => u)
+publish := publish.dependsOn(typescript in Assets).map((u) => u).value
 
-publishLocal <<= publishLocal.dependsOn(typescript in Assets).map((u) => u)
+publishLocal := publishLocal.dependsOn(typescript in Assets).map((u) => u).value
 
 credentials += Credentials("Sonatype Nexus Repository Manager",
         "oss.sonatype.org",

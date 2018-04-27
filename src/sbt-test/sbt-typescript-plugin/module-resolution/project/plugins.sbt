@@ -1,6 +1,6 @@
 addSbtPlugin("com.arpnetworking" % "sbt-typescript" % sys.props("project.version"))
 
-addSbtPlugin("com.typesafe.play" % "sbt-plugin" % "2.5.1")
+addSbtPlugin("com.typesafe.play" % "sbt-plugin" % "2.6.6")
 
 resolvers ++= Seq(
   Resolver.mavenLocal,

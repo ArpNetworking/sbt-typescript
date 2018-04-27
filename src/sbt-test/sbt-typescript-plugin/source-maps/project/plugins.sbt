@@ -24,4 +24,4 @@ resolvers ++= Seq(
   "Typesafe Snapshots Repository" at "http://repo.typesafe.com/typesafe/snapshots/"
 )
 
-libraryDependencies += "com.typesafe.play" %% "play-json" % "2.3.10"
+libraryDependencies += "com.typesafe.play" %% "play-json" % "2.6.6"

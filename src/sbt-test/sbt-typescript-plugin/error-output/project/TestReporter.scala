@@ -17,36 +17,34 @@
 import com.typesafe.sbt.jse.JsEngineImport.JsEngineKeys
 import java.util.concurrent.atomic.AtomicInteger
 import sbt._
-import sbt.Keys._
 
-import com.typesafe.sbt.web.SbtWeb
-import com.typesafe.sbt.web.SbtWeb.autoImport._
+import com.typesafe.sbt.web.CompileProblems.LoggerReporter
 
-object TestBuild extends Build {
+package com.arpnetworking.sbt {
+  import sbt.internal.inc.schema.Severity
+  import xsbti.Problem
 
-  class TestLogger(target: File) extends Logger {
-    val unrecognisedInputCount = new AtomicInteger(0)
+  class TestLogger() extends Logger {
 
     def trace(t: => Throwable): Unit = {}
 
     def success(message: => String): Unit = {}
 
-    def log(level: Level.Value, message: => String): Unit = {
-      if (level == Level.Error) {
-        if (message.contains("Type 'number' is not assignable to type 'string'") &&
-          message.contains("bad.ts") && message.contains(":20")) {
+    def log(level: Level.Value, message: => String): Unit = {}
+  }
+
+  class TestReporter(target: File) extends LoggerReporter(-1, new TestLogger()) {
+    override def log(problem: Problem): Unit = {
+      super.log(problem)
+      if (problem.severity.eq(xsbti.Severity.Error)) {
+        if (problem.message().contains("Type 'number' is not assignable to type 'string'") &&
+          problem.position().sourceFile().map[String](_.name).orElse("").contains("bad.ts") &&
+          problem.position().line().orElse(0).intValue() == 20) {
           IO.touch(target / "valid-error")
         }
       }
     }
   }
 
-  class TestReporter(target: File) extends LoggerReporter(-1, new TestLogger(target))
-
-  lazy val root = Project(
-    id = "test-build",
-    base = file("."),
-    settings = Seq(WebKeys.reporter := new TestReporter(target.value), JsEngineKeys.engineType := JsEngineKeys.EngineType.Node)
-  ).enablePlugins(SbtWeb)
-
 }
+
