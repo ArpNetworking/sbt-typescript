@@ -2,7 +2,7 @@ libraryDependencies += { "org.scala-sbt" %% "scripted-plugin" % sbtVersion.value
 
 resolvers += Resolver.typesafeRepo("releases")
 
-addSbtPlugin("com.arpnetworking" % "sbt-typescript" % "0.4.0")
+addSbtPlugin("com.arpnetworking" % "sbt-typescript" % "0.4.1")
 
 addSbtPlugin("com.github.gseitz" % "sbt-release" % "1.0.8")
 
