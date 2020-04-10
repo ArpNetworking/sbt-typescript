@@ -13,8 +13,6 @@ notifications:
   email:
     recipients:
     - brandon@arpnetworking.com
-jdk:
-- oraclejdk8
 cache:
   directories:
   - $HOME/.ivy2
