@@ -89,8 +89,8 @@ object SbtTypescript extends AutoPlugin {
           taskMessage in TestAssets := "TypeScript test compiling"
         )
     ) ++ SbtJsTask.addJsSourceFileTasks(typescript) ++ Seq(
-      typescript in Assets := (typescript in Assets).dependsOn(webModules in Assets).value,
-      typescript in TestAssets := (typescript in TestAssets).dependsOn(webModules in TestAssets).value
+      typescript in Assets := (typescript in Assets).dependsOn(webModules in Assets, nodeModules in Assets).value,
+      typescript in TestAssets := (typescript in TestAssets).dependsOn(webModules in TestAssets, nodeModules in TestAssets).value
     )
   }
 }
