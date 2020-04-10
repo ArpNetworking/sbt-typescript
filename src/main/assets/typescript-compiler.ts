@@ -143,7 +143,7 @@ namespace sbtts {
       let createResult = (sourceFile: ts.SourceFile): sbtweb.CompilationResult => {
         this.logger.debug(`examining  ${sourceFile.fileName}`);
 
-        let outputFile = inputOutputFileMap[sourceFile.fileName];
+        let outputFile = inputOutputFileMap[this.path.normalize(sourceFile.fileName)];
         let filesWritten = (compilerOptions.outFile) ?
           filesWrittenForSingleFile :
           this.createFilesWrittenArray(outputFile, compilerOptions);
@@ -210,7 +210,7 @@ namespace sbtts {
       let inputOutputFilesMap = this.buildInputOutputFilesMap(inputFiles, compilerOptions);
 
       let sourceFiles: ts.SourceFile[] = compiler.getSourceFiles()
-        .filter((sourceFile: ts.SourceFile) => !!inputOutputFilesMap[sourceFile.fileName]);
+        .filter((sourceFile: ts.SourceFile) => !!inputOutputFilesMap[this.path.normalize(sourceFile.fileName)]);
 
       return {
         results: this.getResults(sourceFiles, compilerOptions, inputOutputFilesMap),
