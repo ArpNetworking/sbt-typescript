@@ -13,7 +13,8 @@ notifications:
     - brandon@arpnetworking.com
 cache:
   directories:
-  - $HOME/.ivy2
+  - "$HOME/.ivy2"
+  - "$HOME/.jdk"
 env:
   global:
   - TARGET="scripted"
