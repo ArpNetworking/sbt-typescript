@@ -88,4 +88,22 @@ Sometimes the default engine (Trireme) can be quite slow. If you're experiencing
 JsEngineKeys.engineType := JsEngineKeys.EngineType.Node
 ```
 
+Versions
+--------
+
+The TypeScript version included in sbt-typescript and the Scala version support are as follows.
+
+Version | TypesScript | Scala
+--------|-------------|-------
+0.4.2   | 2.6.2       | 2.12.5
+0.4.1   | 2.6.2       | 2.12.5
+0.3.6   | 2.6.2       | 2.10.7, 2.11.12, 2.12.5
+0.3.5   | 2.6.2       | 2.10.5
+0.3.4   | 2.3.1       | 2.10.5
+0.3.3   | 2.2.1       | 2.10.5
+0.3.2   | 2.0.2       | 2.10.5
+0.3.1   | 2.0.2       | 2.10.5
+0.2.3   | 2.0.0       | 2.10.5
+0.2.2   | 2.0.0       | 2.10.5
+
 &copy; Groupon Inc., 2014
