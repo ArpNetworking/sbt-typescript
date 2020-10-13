@@ -4,8 +4,8 @@ addSbtPlugin("com.typesafe.play" % "sbt-plugin" % "2.6.6")
 
 resolvers ++= Seq(
   Resolver.mavenLocal,
-  Resolver.url("sbt snapshot plugins", url("http://repo.scala-sbt.org/scalasbt/sbt-plugin-snapshots"))(Resolver.ivyStylePatterns),
+  Resolver.url("sbt snapshot plugins", url("https://repo.scala-sbt.org/scalasbt/sbt-plugin-snapshots"))(Resolver.ivyStylePatterns),
   Resolver.sonatypeRepo("snapshots"),
-  "Typesafe repository" at "http://repo.typesafe.com/typesafe/releases/",
-  "Typesafe Snapshots Repository" at "http://repo.typesafe.com/typesafe/snapshots/"
+  "Typesafe repository" at "https://repo.typesafe.com/typesafe/releases/",
+  "Typesafe Snapshots Repository" at "https://repo.typesafe.com/typesafe/snapshots/"
 )
