@@ -32,7 +32,7 @@ lazy val root = (project in file(".")).enablePlugins(SbtWeb)
 
 libraryDependencies ++= Seq(
   "org.webjars.npm" % "typescript" % "2.6.2",
-  "com.typesafe" % "jstranspiler" % "1.0.0"
+  "com.typesafe" % "jstranspiler" % "1.0.1"
 )
 
 resolvers ++= Seq(
@@ -43,7 +43,7 @@ resolvers ++= Seq(
   "Typesafe Snapshots Repository" at "https://repo.typesafe.com/typesafe/snapshots/"
 )
 
-addSbtPlugin("com.typesafe.sbt" %% "sbt-js-engine" % "1.2.2")
+addSbtPlugin("com.typesafe.sbt" %% "sbt-js-engine" % "1.2.3")
 
 scalacOptions += "-feature"
 

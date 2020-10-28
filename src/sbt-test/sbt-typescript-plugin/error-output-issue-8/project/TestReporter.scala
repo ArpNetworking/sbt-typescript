@@ -22,20 +22,20 @@ import com.typesafe.sbt.web.CompileProblems.LoggerReporter
 
 package com.arpnetworking.sbt {
   import sbt.internal.inc.schema.Severity
+  import sbt.internal.util.ManagedLogger
   import xsbti.Problem
 
-  class TestLogger() extends Logger {
+  class TestLogger() extends ManagedLogger ("logger", Option.empty, Option.empty, null) {
 
-    def trace(t: => Throwable): Unit = {}
+    override def trace(t: => Throwable): Unit = {}
 
-    def success(message: => String): Unit = {}
+    override def success(message: => String): Unit = {}
 
-    def log(level: Level.Value, message: => String): Unit = {}
+    override def log(level: Level.Value, message: => String): Unit = {}
   }
 
   class TestReporter(target: File) extends LoggerReporter(-1, new TestLogger()) {
     override def log(problem: Problem): Unit = {
-      super.log(problem)
       if (problem.severity.eq(xsbti.Severity.Error)) {
         if (problem.message().contains("is not assignable to parameter") &&
           problem.position().sourceFile().map[String](_.name).orElse("").contains("bad.ts") &&
