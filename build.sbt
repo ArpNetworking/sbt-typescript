@@ -26,7 +26,7 @@ organization := "com.arpnetworking"
 
 name := "sbt-typescript"
 
-scalaVersion := "2.12.5"
+scalaVersion := "2.12.12"
 
 lazy val root = (project in file(".")).enablePlugins(SbtWeb)
 
