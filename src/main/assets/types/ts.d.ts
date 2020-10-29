@@ -53,7 +53,7 @@ declare namespace ts {
                                existingOptions?: CompilerOptions, configFileName?: string,
                                resolutionStack?: Path[]): ParsedCommandLine
     createCompilerHost(compilerSettings: CompilerOptions): CompilerHost;
-    createProgram(sources: string[], compilerOptions: CompilerOptions, compilerHost: CompilerHost): Program;
+    createProgram(sources: string[], compilerOptions: CompilerOptions): Program;
   }
 
   interface CompilerHost {

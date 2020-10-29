@@ -17,26 +17,29 @@ namespace sbtts {
       this.logger.debug(`args = ${JSON.stringify(args)}`);
     }
 
-    private getTSConfig(options: sbtts.Options): ts.ParsedCommandLine {
+    private getTSConfig(options: sbtts.Options, existingOpts: any): ts.ParsedCommandLine {
       let configFilePath = this.path.join(options.projectBase, options.configFile);
+      this.logger.debug(`reading tsconfig.json from ${configFilePath}`);
       let configJson = JSON.parse(this.fs.readFileSync(configFilePath, 'utf-8'));
       let configDir = this.path.dirname(configFilePath);
       let configFileName = this.path.basename(configFilePath);
 
       return this.typescript.parseJsonConfigFileContent(
-        configJson, this.typescript.sys, configDir, {}, configFileName
+        configJson, this.typescript.sys, configDir, existingOpts, configFileName
       );
     }
 
     private createCompilerOptions(args: sbtweb.Arguments<sbtts.Options>): ts.CompilerOptions {
       this.logger.debug('creating compiler settings');
-      let config = this.getTSConfig(args.options);
+      let existingOpts = {
+        rootDir: args.options.rootDir,
+        baseUrl: args.options.baseUrl,
+        outDir: args.target,
+        sourceRoot: args.options.sourceRoot,
+      };
+      let config = this.getTSConfig(args.options, existingOpts);
       let compSettings = config.options;
 
-      compSettings.rootDir = args.options.rootDir;
-      compSettings.baseUrl = args.options.baseUrl;
-      compSettings.outDir = args.target;
-      compSettings.sourceRoot = args.options.sourceRoot;
 
       return compSettings;
     }
@@ -179,13 +182,15 @@ namespace sbtts {
     private createCompiler(sources: string[], compilerOptions: ts.CompilerOptions): ts.Program {
       this.logger.debug(`createProgram with ${sources}`);
 
-      return this.typescript.createProgram(sources, compilerOptions, this.typescript.createCompilerHost(compilerOptions));
+      return this.typescript.createProgram(sources, compilerOptions);
     }
 
     private getOutputFileName(compilerOptions: ts.CompilerOptions, fileName: string): string {
       let relativeFilePath = this.getRelativePath(compilerOptions.rootDir, fileName);
 
-      return this.path.join(compilerOptions.outDir, this.replaceFileExtension(this.path.normalize(relativeFilePath), '.js'));
+      let finalPath = this.path.join(compilerOptions.outDir, this.replaceFileExtension(this.path.normalize(relativeFilePath), '.js'));
+      this.logger.debug(`mapping file '${fileName}' to relative path '${relativeFilePath}' to '${finalPath}'`);
+      return finalPath;
     }
 
     private buildInputOutputFilesMap(inputFiles: string[], compilerOptions: ts.CompilerOptions): sbtts.Map {
@@ -199,10 +204,15 @@ namespace sbtts {
 
     public compile(args: sbtweb.Arguments<sbtts.Options>): sbtweb.CompilerOutput {
       let compilerOptions = this.createCompilerOptions(args);
+      if (compilerOptions.outFile) {
+        compilerOptions.outFile = this.getOutputFileName(compilerOptions, compilerOptions.outFile);
+      }
       this.logger.debug(`compilerOptions = ${JSON.stringify(compilerOptions)}`);
 
       let compiler = this.createCompiler(args.options.sources, compilerOptions);
+      this.logger.debug(`compiler: ${JSON.stringify(compiler)}`);
       let emitOutput = compiler.emit();
+      this.logger.debug(`emitOutput: ${JSON.stringify(emitOutput)}`);
 
       let diagnostics = this.getProgramDiagnostics(compiler, emitOutput);
 
@@ -212,9 +222,12 @@ namespace sbtts {
       let sourceFiles: ts.SourceFile[] = compiler.getSourceFiles()
         .filter((sourceFile: ts.SourceFile) => !!inputOutputFilesMap[this.path.normalize(sourceFile.fileName)]);
 
+      let results = this.getResults(sourceFiles, compilerOptions, inputOutputFilesMap);
+      let problems = diagnostics.map((diagnostic) => this.createProblem(diagnostic));
+      this.logger.debug(`problems: ${JSON.stringify(problems)}`)
       return {
-        results: this.getResults(sourceFiles, compilerOptions, inputOutputFilesMap),
-        problems: diagnostics.map((diagnostic) => this.createProblem(diagnostic))
+        results: results,
+        problems: problems
       };
     }
   }

@@ -5,8 +5,6 @@
 // Definitions by: Ron Buckton <http://github.com/rbuckton>
 // Definitions: https://github.com/borisyankov/DefinitelyTyped
 
-declare type PropertyKey = string | number | symbol;
-
 interface IteratorResult<T> {
     done: boolean;
     value?: T;

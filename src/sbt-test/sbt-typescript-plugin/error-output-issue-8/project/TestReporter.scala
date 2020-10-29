@@ -37,7 +37,7 @@ package com.arpnetworking.sbt {
   class TestReporter(target: File) extends LoggerReporter(-1, new TestLogger()) {
     override def log(problem: Problem): Unit = {
       if (problem.severity.eq(xsbti.Severity.Error)) {
-        if (problem.message().contains("is not assignable to parameter") &&
+        if (problem.message().contains("is not assignable to type") &&
           problem.position().sourceFile().map[String](_.name).orElse("").contains("bad.ts") &&
           problem.position().line().orElse(0).intValue() == 25) {
           IO.touch(target / "valid-error")

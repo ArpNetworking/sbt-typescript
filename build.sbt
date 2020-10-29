@@ -31,7 +31,7 @@ scalaVersion := "2.12.12"
 lazy val root = (project in file(".")).enablePlugins(SbtWeb)
 
 libraryDependencies ++= Seq(
-  "org.webjars.npm" % "typescript" % "2.6.2",
+  "org.webjars.npm" % "typescript" % "4.0.5",
   "com.typesafe" % "jstranspiler" % "1.0.1"
 )
 
@@ -86,7 +86,7 @@ pomExtra := (
       </developer>
     </developers>)
 
-
+enablePlugins(SbtPlugin)
 
 scriptedLaunchOpts += { version apply { v => s"-Dproject.version=$v" } }.value
 
